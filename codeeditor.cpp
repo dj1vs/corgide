@@ -54,6 +54,8 @@
 #include <QTextBlock>
 #include <QFile>
 #include <QAction>
+#include <QFileDialog>
+#include <QMessageBox>
 
 //![constructor]
 
@@ -194,20 +196,35 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 //![extraAreaPaintEvent_2]
 
 void CodeEditor::save_file() {
-    QFile file("test.cpp");
+    QString file_name_filter = "";
+    const QString file_name = QFileDialog::getSaveFileName(this, "Chose file save path", "", "All files", &file_name_filter);
+    if (!file_name.length()) {
+        QMessageBox::warning(this, "Warning", "File was not selected", QMessageBox::Ok);
+        return;
+    }
+    QFile file(file_name);
 
     if (!file.open(QIODevice::WriteOnly)) {
-        return; // display this event
+        QMessageBox::critical(this, "Error", "Can't open file", QMessageBox::Ok);
+        return;
     }
 
     file.write(this->toPlainText().toUtf8());
 }
 
 void CodeEditor::open_file() {
-    QFile file("test.cpp");
+    QString file_name_filter = "";
+    const QString file_name = QFileDialog::getOpenFileName(this, "Choose file to open", "", "All files", &file_name_filter);
+    if (!file_name.length()) {
+        QMessageBox::warning(this, "Warning", "File was not selected", QMessageBox::Ok);
+        return;
+    } 
+
+    QFile file(file_name);
 
     if (!file.open(QIODevice::ReadOnly)) {
-        return; // display this event
+        QMessageBox::critical(this, "Error", "Can't open file", QMessageBox::Ok);
+        return;
     }
 
     QString file_contents = file.readAll();

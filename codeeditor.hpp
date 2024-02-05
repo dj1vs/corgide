@@ -85,11 +85,13 @@ private slots:
 
 private:
     void save_file();
+    void open_file();
 
 private:
     QWidget *lineNumberArea;
 
     QAction *save_file_action;
+    QAction *open_file_action;
 
 };
 

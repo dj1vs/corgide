@@ -62,12 +62,16 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     lineNumberArea = new LineNumberArea(this);
 
     save_file_action = new QAction("Save file");
+    open_file_action = new QAction("Open file");
 
     save_file_action->setShortcut(QKeySequence::Save);
+    open_file_action->setShortcut(QKeySequence::Open);
 
     addAction(save_file_action);
+    addAction(open_file_action);
 
     connect(save_file_action, &QAction::triggered, this, &CodeEditor::save_file);
+    connect(open_file_action, &QAction::triggered, this, &CodeEditor::open_file);
 
     connect(this, &CodeEditor::blockCountChanged, this, &CodeEditor::updateLineNumberAreaWidth);
     connect(this, &CodeEditor::updateRequest, this, &CodeEditor::updateLineNumberArea);
@@ -193,8 +197,20 @@ void CodeEditor::save_file() {
     QFile file("test.cpp");
 
     if (!file.open(QIODevice::WriteOnly)) {
-        return;
+        return; // display this event
     }
 
     file.write(this->toPlainText().toUtf8());
+}
+
+void CodeEditor::open_file() {
+    QFile file("test.cpp");
+
+    if (!file.open(QIODevice::ReadOnly)) {
+        return; // display this event
+    }
+
+    QString file_contents = file.readAll();
+
+    this->setPlainText(file_contents);
 }

@@ -6,19 +6,28 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
+set(CMAKE_AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/app/cpp/ui")
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
+file(GLOB_RECURSE app_inc "${CMAKE_CURRENT_SOURCE_DIR}/app/cpp/include/*.hpp")
+file(GLOB_RECURSE app_src "${CMAKE_CURRENT_SOURCE_DIR}/app/cpp/src/*.cpp")
+file(GLOB_RECURSE app_ui  "${CMAKE_CURRENT_SOURCE_DIR}/app/cpp/*.ui")
+
+file(GLOB_RECURSE qsourcehighlite_inc "${CMAKE_CURRENT_SOURCE_DIR}/QSourceHighlite/*.hpp")
+file(GLOB_RECURSE qsourcehighlite_cpp "${CMAKE_CURRENT_SOURCE_DIR}/QSourceHighlite/*.cpp")
+
 set(PROJECT_SOURCES
-        main.cpp
-        mainwindow.cpp
-        mainwindow.h
-        codeeditor.cpp
-        codeeditor.hpp
-        mainwindow.ui
+        ${app_inc}
+        ${app_src}
+        ${app_ui}
+
+        ${qsourcehighlite_inc}
+        ${qsourcehighlite_cpp}
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -31,18 +40,16 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 #                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
 # For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
 else()
-    if(ANDROID)
-        add_library(corgide SHARED
-            ${PROJECT_SOURCES}
+    add_executable(corgide
+        ${PROJECT_SOURCES}
         )
-# Define properties for Android with Qt 5 after find_package() calls as:
-#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
-    else()
-        add_executable(corgide
-            ${PROJECT_SOURCES}
-        )
-    endif()
 endif()
+
+target_include_directories(${PROJECT_NAME} PUBLIC 
+    "${CMAKE_CURRENT_SOURCE_DIR}/app/cpp/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/app/cpp/ui"
+    "${CMAKE_CURRENT_SOURCE_DIR}/QSourceHighlite"
+)
 
 target_link_libraries(corgide PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 

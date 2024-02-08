@@ -12,6 +12,8 @@
 
 CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 {
+    this->setTabStopDistance(QFontMetricsF(this->font()).horizontalAdvance(' ') * 4);
+
     lineNumberArea = new LineNumberArea(this);
     
     connect(this, &CodeEditor::blockCountChanged, this, &CodeEditor::updateLineNumberAreaWidth);
@@ -157,8 +159,6 @@ void CodeEditor::add_leading_offset() {
 
     const QString line = editor_text.mid(line_begin, start_cursor_pos - line_begin - 1);
 
-    qDebug() << line_begin << line_end << line;
-
     if (line.isEmpty()) {
         return;
     }
@@ -200,4 +200,4 @@ void CodeEditor::add_leading_offset() {
 
         this->moveCursor(QTextCursor::EndOfLine);
     }
-}
+} 

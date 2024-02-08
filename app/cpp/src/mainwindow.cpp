@@ -3,6 +3,7 @@
 
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QDebug>
 
 #include "qsourcehighliter.h"
 
@@ -19,8 +20,12 @@ MainWindow::MainWindow(QWidget *parent)
     
     connect(ui->new_tab_action,   &QAction::triggered, this, &MainWindow::open_new_tab);
     connect(ui->close_tab_action, &QAction::triggered, this, &MainWindow::close_tab);
+    connect(ui->next_tab_action, &QAction::triggered, this, &MainWindow::next_tab);
+    connect(ui->prev_tab_action, &QAction::triggered, this, &MainWindow::prev_tab);
     connect(ui->open_file_action, &QAction::triggered, this, &MainWindow::open_file);
     connect(ui->save_file_action, &QAction::triggered, this, &MainWindow::save_file);
+
+    open_new_tab();
 }
 
 MainWindow::~MainWindow() {
@@ -40,6 +45,28 @@ void MainWindow::close_tab() {
     if (ui->tab_widget->count()) {
         ui->tab_widget->removeTab(ui->tab_widget->currentIndex());
     }
+}
+
+void MainWindow::next_tab() {
+    const int cur_ind = ui->tab_widget->currentIndex();
+    
+    int next_ind = cur_ind + 1;
+    if (next_ind == ui->tab_widget->count()) {
+        next_ind = 0;
+    }
+
+    ui->tab_widget->setCurrentIndex(next_ind);
+}
+
+void MainWindow::prev_tab() {
+    const int cur_ind = ui->tab_widget->currentIndex();
+    
+    int next_ind = cur_ind - 1;
+    if (next_ind == -1) {
+        next_ind = ui->tab_widget->count() - 1;
+    }
+
+    ui->tab_widget->setCurrentIndex(next_ind);
 }
 
 void MainWindow::open_file() {

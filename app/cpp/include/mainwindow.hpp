@@ -20,15 +20,13 @@ public:
 private slots:
     void open_new_tab();
     void close_tab();
+    void next_tab();
+    void prev_tab();
 
     void open_file();
     void save_file();
 
 private:
     Ui::MainWindow *ui;
-
-    QAction *new_tab_action;
-    QAction *open_file_action;
-    QAction *save_file_action;
 };
 #endif // MAINWINDOW_H

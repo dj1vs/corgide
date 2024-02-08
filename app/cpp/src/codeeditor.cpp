@@ -6,6 +6,7 @@
 #include <QAction>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QDebug>
 
 //![constructor]
 
@@ -16,6 +17,8 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
     connect(this, &CodeEditor::blockCountChanged, this, &CodeEditor::updateLineNumberAreaWidth);
     connect(this, &CodeEditor::updateRequest, this, &CodeEditor::updateLineNumberArea);
     connect(this, &CodeEditor::cursorPositionChanged, this, &CodeEditor::highlightCurrentLine);
+
+
 
     updateLineNumberAreaWidth(0);
     highlightCurrentLine();
@@ -47,7 +50,6 @@ void CodeEditor::updateLineNumberAreaWidth(int /* newBlockCount */)
 {
     setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);
 }
-
 //![slotUpdateExtraAreaWidth]
 
 //![slotUpdateRequest]
@@ -65,8 +67,6 @@ void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)
 
 //![slotUpdateRequest]
 
-//![resizeEvent]
-
 void CodeEditor::resizeEvent(QResizeEvent *e)
 {
     QPlainTextEdit::resizeEvent(e);
@@ -75,7 +75,14 @@ void CodeEditor::resizeEvent(QResizeEvent *e)
     lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
 }
 
-//![resizeEvent]
+void CodeEditor::keyPressEvent(QKeyEvent *event) {
+    QPlainTextEdit::keyPressEvent(event);
+
+    if (event->key() == Qt::Key_Return) {
+        add_leading_offset();
+    }
+}
+
 
 //![cursorPositionChanged]
 
@@ -86,7 +93,7 @@ void CodeEditor::highlightCurrentLine()
     if (!isReadOnly()) {
         QTextEdit::ExtraSelection selection;
 
-        QColor lineColor = QColor(Qt::cyan).darker(175);
+        QColor lineColor = QColor(Qt::black).lighter(5);
 
         selection.format.setBackground(lineColor);
         selection.format.setProperty(QTextFormat::FullWidthSelection, true);
@@ -132,3 +139,65 @@ void CodeEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
     }
 }
 //![extraAreaPaintEvent_2]
+
+void CodeEditor::add_leading_offset() {
+    QString editor_text = this->toPlainText();
+
+    const int start_cursor_pos = this->textCursor().position();
+    const int line_end = start_cursor_pos - 2;
+    int line_begin;
+
+    for (line_begin = line_end; line_begin >= 0 && editor_text[line_begin] != '\n'; --line_begin);
+
+    if (line_begin >= 0) { // if we found the end of the previous line
+        ++line_begin;
+    } else { // if we didn't found it, than we are on the first line;
+        line_begin = 0;
+    }
+
+    const QString line = editor_text.mid(line_begin, start_cursor_pos - line_begin - 1);
+
+    qDebug() << line_begin << line_end << line;
+
+    if (line.isEmpty()) {
+        return;
+    }
+
+
+
+    QString offset;
+    for (const auto &ch : line) {
+        switch (ch.toLatin1()) {
+            case ' ':
+            case '\t':
+                offset += ch;
+            break;
+            default:
+                goto end;
+            break;
+        }
+    }
+
+    end:
+    if (line.back() == '{') {
+        offset += '\t';
+    }
+
+    if (!offset.isEmpty()) {
+        insertPlainText(offset);
+    }
+
+    if (line.back() == '{') {
+        if (offset.back() == '\t') {
+            offset.chop(1);
+        }
+
+        insertPlainText('\n' + offset + '}');
+
+        QTextCursor temp_cursor = this->textCursor();
+        temp_cursor.setPosition(start_cursor_pos);
+        setTextCursor(temp_cursor);
+
+        this->moveCursor(QTextCursor::EndOfLine);
+    }
+}

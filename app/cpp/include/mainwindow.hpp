@@ -19,7 +19,7 @@ public:
 
 private slots:
     void open_new_tab();
-    void close_tab();
+    void close_tab(int index);
     void next_tab();
     void prev_tab();
 

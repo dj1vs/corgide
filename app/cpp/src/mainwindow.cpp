@@ -1,9 +1,12 @@
 #include "mainwindow.hpp"
 #include "ui_mainwindow.h"
 
+#include <algorithm>
+
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QDebug>
+#include <QRegularExpression>
 
 #include "qsourcehighliter.h"
 
@@ -38,12 +41,47 @@ void MainWindow::open_new_tab() {
     auto *highlighter = new QSourceHighlite::QSourceHighliter(editor->document());
     highlighter->setCurrentLanguage(QSourceHighlite::QSourceHighliter::CodeCpp);
 
-    ui->tab_widget->addTab(editor, "New");
+    QRegularExpression untitled_regexp("Untitled (^\\d+$)");
+    QVector<int> untitled_numbers;
+    const int tabs_amount = ui->tab_widget->count();
+    for (int i = 0; i < tabs_amount; ++i) {
+        const QString tab_name = ui->tab_widget->tabText(i);
+        const auto untitled_regexp_match = untitled_regexp.match(tab_name);
+        if (!untitled_regexp_match.isValid()) {
+            continue;
+        }
+
+        const qsizetype tab_name_begin = tab_name.indexOf('(') + 1;
+        const qsizetype tab_name_end = tab_name.indexOf(')') - 1;
+        const QString tab_number = tab_name.mid(tab_name_begin, tab_name_end - tab_name_begin + 1);
+        untitled_numbers.push_back(tab_number.toInt());
+    }
+
+    std::sort(untitled_numbers.begin(), untitled_numbers.end());
+    int new_tab_number = -1;
+    for (qsizetype i = 1; i < untitled_numbers.size(); ++i) {
+        if (untitled_numbers[i] != untitled_numbers[i-1] + 1) {
+            new_tab_number = untitled_numbers[i-1] + 1;
+            break;
+        }
+    }
+
+    if (new_tab_number == -1 && untitled_numbers.size()) {
+        new_tab_number = untitled_numbers.back() + 1;
+    }
+
+    QString new_tab_name = "Untitled";
+    if (new_tab_number != -1) {
+        new_tab_name += " (" + QString::number(new_tab_number) + ')';
+    }
+
+    ui->tab_widget->addTab(editor, new_tab_name);
+    ui->tab_widget->setCurrentIndex(ui->tab_widget->count() - 1); // go to new tab
 }
 
-void MainWindow::close_tab() {
+void MainWindow::close_tab(int index) {
     if (ui->tab_widget->count()) {
-        ui->tab_widget->removeTab(ui->tab_widget->currentIndex());
+        ui->tab_widget->removeTab(index);
     }
 }
 

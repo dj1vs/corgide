@@ -9,6 +9,7 @@ class CodeEditor;
 class QFileSystemModel;
 class QAction;
 class QMenu;
+class QShowEvent;
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
@@ -39,6 +40,9 @@ private:
     void save_file(const QString &file_name);
 
     void open_folder(const QString &folder_name);
+
+    void write_settings();
+    void read_settings();
 
 private:
     Ui::MainWindow *ui;

@@ -10,6 +10,7 @@
 #include <QFileSystemModel>
 #include <QMenu>
 #include <QModelIndexList>
+#include <QSettings>
 
 #include "qsourcehighliter.h"
 
@@ -24,7 +25,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     fs_model = new QFileSystemModel;
     fs_model->setRootPath(QDir::root().absolutePath());
-    ui->tree_view->setContextMenuPolicy(Qt::CustomContextMenu);
 
     fs_context_menu = new QMenu;
     fs_open_file_action = new QAction("Open file");
@@ -45,9 +45,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->open_file_action,   &QAction::triggered,            this, &MainWindow::ask_open_file    );
     connect(ui->save_file_action,   &QAction::triggered,            this, &MainWindow::ask_save_file);
     connect(ui->open_folder_action, &QAction::triggered,            this, &MainWindow::ask_open_folder  );
+
+    read_settings();
 }
 
 MainWindow::~MainWindow() {
+    write_settings();
+
     delete ui;
 }
 
@@ -181,9 +185,9 @@ void MainWindow::open_fs_file() {
 
     const QString file_path = fs_model->filePath(selected_row);
 
-    open_file(file_path);
-
-
+    if (QFileInfo(file_path).isFile()) {
+        open_file(file_path);\
+    }
 }
 
 void MainWindow::ask_open_folder() {
@@ -247,12 +251,41 @@ void MainWindow::save_file(const QString &file_name) {
 void MainWindow::open_folder(const QString &folder_name) {
     if (!is_folder_opened) {
         ui->tree_view->setModel(fs_model);
-        is_folder_opened = false;
+        is_folder_opened = true;
 
+        ui->tree_view->setHeaderHidden(true);
         for (int i = 1; i < fs_model->columnCount(); ++i) {
             ui->tree_view->setColumnHidden(i, true);
         }
     }
 
     ui->tree_view->setRootIndex(fs_model->index(folder_name));
+}
+
+void MainWindow::write_settings() {
+    QSettings settings(QApplication::organizationName(), QApplication::applicationName());
+
+    settings.setValue("tree_view_width", ui->tree_view->width());
+    settings.setValue("tab_widget_width", ui->tab_widget->width());
+
+    if (is_folder_opened) {
+        settings.setValue("folder", fs_model->fileInfo(ui->tree_view->rootIndex()).absoluteFilePath());
+    } else {
+        settings.setValue("folder", "-");
+    }
+}
+void MainWindow::read_settings() {
+    QSettings settings(QApplication::organizationName(), QApplication::applicationName());
+
+    const int tree_view_width = settings.value("tree_view_width", "100").toInt();
+    const int tab_widget_width = settings.value("tab_widget_width", "500").toInt();
+
+    ui->splitter->setSizes({tree_view_width, tab_widget_width});
+
+    const QString folder = settings.value("folder", "-").toString();
+    if (folder != "-") {
+        open_folder(folder);
+        is_folder_opened = true;
+    }
+
 }

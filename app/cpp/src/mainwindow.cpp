@@ -7,6 +7,9 @@
 #include <QFileDialog>
 #include <QDebug>
 #include <QRegularExpression>
+#include <QFileSystemModel>
+#include <QMenu>
+#include <QModelIndexList>
 
 #include "qsourcehighliter.h"
 
@@ -19,14 +22,29 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->tab_widget->setTabsClosable(true);
 
-    connect(ui->tab_widget, &QTabWidget::tabCloseRequested, this, &MainWindow::close_tab);
-    
-    connect(ui->new_tab_action,   &QAction::triggered, this, &MainWindow::open_new_tab);
-    connect(ui->close_tab_action, &QAction::triggered, this, &MainWindow::close_tab);
-    connect(ui->next_tab_action, &QAction::triggered, this, &MainWindow::next_tab);
-    connect(ui->prev_tab_action, &QAction::triggered, this, &MainWindow::prev_tab);
-    connect(ui->open_file_action, &QAction::triggered, this, &MainWindow::open_file);
-    connect(ui->save_file_action, &QAction::triggered, this, &MainWindow::save_file);
+    fs_model = new QFileSystemModel;
+    fs_model->setRootPath(QDir::root().absolutePath());
+    ui->tree_view->setModel(fs_model);
+    ui->tree_view->setContextMenuPolicy(Qt::CustomContextMenu);
+
+    fs_context_menu = new QMenu;
+    fs_open_file_action = new QAction("Open file");
+
+    fs_context_menu->addAction(fs_open_file_action);
+
+    connect(fs_open_file_action, &QAction::triggered, this, &MainWindow::open_fs_file);
+
+    connect(ui->tree_view, &QTreeView::customContextMenuRequested, this, &MainWindow::show_fs_context_menu);
+
+    connect(ui->tab_widget,         &QTabWidget::tabCloseRequested, this, &MainWindow::close_tab    );
+
+    connect(ui->new_tab_action,     &QAction::triggered,            this, &MainWindow::open_new_tab );
+    connect(ui->close_tab_action,   &QAction::triggered,            this, &MainWindow::close_tab    );
+    connect(ui->next_tab_action,    &QAction::triggered,            this, &MainWindow::next_tab     );
+    connect(ui->prev_tab_action,    &QAction::triggered,            this, &MainWindow::prev_tab     );
+    connect(ui->open_file_action,   &QAction::triggered,            this, &MainWindow::ask_open_file    );
+    connect(ui->save_file_action,   &QAction::triggered,            this, &MainWindow::ask_save_file);
+    connect(ui->open_folder_action, &QAction::triggered,            this, &MainWindow::open_folder  );
 
     open_new_tab();
 }
@@ -107,7 +125,7 @@ void MainWindow::prev_tab() {
     ui->tab_widget->setCurrentIndex(next_ind);
 }
 
-void MainWindow::open_file() {
+void MainWindow::ask_open_file() {
     QString file_name_filter = "";
     const QString file_name = QFileDialog::getOpenFileName(this, "Choose file to open", "", "", &file_name_filter);
     if (!file_name.length()) {
@@ -115,29 +133,10 @@ void MainWindow::open_file() {
         return;
     } 
 
-    QFile file(file_name);
-
-    if (!file.open(QIODevice::ReadOnly)) {
-        QMessageBox::critical(this, "Error", "Can't open file", QMessageBox::Ok);
-        return;
-    }
-
-    QString file_contents = file.readAll();
-
-    if (!ui->tab_widget->count()) {
-        open_new_tab();
-    }
-
-    auto cur_editor = dynamic_cast<CodeEditor*>(ui->tab_widget->currentWidget());
-
-    cur_editor->setPlainText(file_contents);
-    cur_editor->set_file_name(file.fileName());
-
-    const int cur_tab_ind = ui->tab_widget->currentIndex();
-    ui->tab_widget->setTabText(cur_tab_ind, QFileInfo(file.fileName()).fileName());
+    open_file(file_name);
 }
 
-void MainWindow::save_file() {
+void MainWindow::ask_save_file() {
     QString file_name;
 
     auto cur_editor = dynamic_cast<CodeEditor*>(ui->tab_widget->currentWidget());
@@ -160,4 +159,63 @@ void MainWindow::save_file() {
     }
 
     file.write(dynamic_cast<QPlainTextEdit*>(ui->tab_widget->currentWidget())->toPlainText().toUtf8());
+
+    file.close();
+
+    const int cur_tab_ind = ui->tab_widget->currentIndex();
+    ui->tab_widget->setTabText(cur_tab_ind, QFileInfo(file.fileName()).fileName());
+}
+
+void MainWindow::open_fs_file() {
+    QModelIndexList fs_rows = ui->tree_view->selectionModel()->selectedRows();
+    if (fs_rows.size() != 1) {
+        return;
+    }
+
+    QModelIndex selected_row = fs_rows.front();
+
+    const QString file_path = fs_model->filePath(selected_row);
+
+    open_file(file_path);
+
+
+}
+
+void MainWindow::open_folder() {
+    const QString folder_path = QFileDialog::getExistingDirectory(this, "Open folder", "");
+    if (folder_path.isEmpty()) {
+        return;
+    }
+
+    ui->tree_view->setRootIndex(fs_model->index(folder_path));
+}
+
+void MainWindow::show_fs_context_menu(const QPoint &point) {
+    fs_context_menu->exec(ui->tree_view->viewport()->mapToGlobal(point));
+
+}
+
+void MainWindow::open_file(const QString &file_name) {
+    QFile file(file_name);
+
+    if (!file.open(QIODevice::ReadOnly)) {
+        QMessageBox::critical(this, "Error", "Can't open file", QMessageBox::Ok);
+        return;
+    }
+
+    QString file_contents = file.readAll();
+
+    file.close();
+
+    if (!ui->tab_widget->count()) {
+        open_new_tab();
+    }
+
+    auto cur_editor = dynamic_cast<CodeEditor*>(ui->tab_widget->currentWidget());
+
+    cur_editor->setPlainText(file_contents);
+    cur_editor->set_file_name(file.fileName());
+
+    const int cur_tab_ind = ui->tab_widget->currentIndex();
+    ui->tab_widget->setTabText(cur_tab_ind, QFileInfo(file.fileName()).fileName());
 }

@@ -6,20 +6,30 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>937</width>
-    <height>697</height>
+    <width>940</width>
+    <height>580</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>CorgIDE</string>
+  </property>
+  <property name="windowIcon">
+   <iconset theme="accessories-text-editor">
+    <normaloff>.</normaloff>.</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QTabWidget" name="tab_widget">
-      <property name="currentIndex">
-       <number>-1</number>
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
       </property>
+      <widget class="QTreeView" name="tree_view"/>
+      <widget class="QTabWidget" name="tab_widget">
+       <property name="currentIndex">
+        <number>-1</number>
+       </property>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -29,7 +39,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>937</width>
+     <width>940</width>
      <height>26</height>
     </rect>
    </property>
@@ -49,8 +59,15 @@
     <addaction name="next_tab_action"/>
     <addaction name="prev_tab_action"/>
    </widget>
+   <widget class="QMenu" name="menuFolder">
+    <property name="title">
+     <string>Folder</string>
+    </property>
+    <addaction name="open_folder_action"/>
+   </widget>
    <addaction name="file_menu"/>
    <addaction name="tab_menu"/>
+   <addaction name="menuFolder"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="open_file_action">
@@ -99,6 +116,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+PgUp</string>
+   </property>
+  </action>
+  <action name="open_folder_action">
+   <property name="text">
+    <string>Open</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+K, Ctrl+O</string>
    </property>
   </action>
  </widget>

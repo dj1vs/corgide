@@ -30,12 +30,15 @@ private slots:
 
     void open_fs_file();
 
-    void open_folder();
+    void ask_open_folder();
 
     void show_fs_context_menu(const QPoint &point);
 
 private:
     void open_file(const QString &file_name);
+    void save_file(const QString &file_name);
+
+    void open_folder(const QString &folder_name);
 
 private:
     Ui::MainWindow *ui;
@@ -44,5 +47,7 @@ private:
 
     QMenu *fs_context_menu;
     QAction *fs_open_file_action;
+
+    bool is_folder_opened = false;
 };
 #endif // MAINWINDOW_H

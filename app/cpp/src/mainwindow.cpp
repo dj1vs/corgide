@@ -24,7 +24,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     fs_model = new QFileSystemModel;
     fs_model->setRootPath(QDir::root().absolutePath());
-    ui->tree_view->setModel(fs_model);
     ui->tree_view->setContextMenuPolicy(Qt::CustomContextMenu);
 
     fs_context_menu = new QMenu;
@@ -33,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
     fs_context_menu->addAction(fs_open_file_action);
 
     connect(fs_open_file_action, &QAction::triggered, this, &MainWindow::open_fs_file);
+    connect(ui->tree_view, &QTreeView::doubleClicked, this, &MainWindow::open_fs_file);
 
     connect(ui->tree_view, &QTreeView::customContextMenuRequested, this, &MainWindow::show_fs_context_menu);
 
@@ -44,9 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->prev_tab_action,    &QAction::triggered,            this, &MainWindow::prev_tab     );
     connect(ui->open_file_action,   &QAction::triggered,            this, &MainWindow::ask_open_file    );
     connect(ui->save_file_action,   &QAction::triggered,            this, &MainWindow::ask_save_file);
-    connect(ui->open_folder_action, &QAction::triggered,            this, &MainWindow::open_folder  );
-
-    open_new_tab();
+    connect(ui->open_folder_action, &QAction::triggered,            this, &MainWindow::ask_open_folder  );
 }
 
 MainWindow::~MainWindow() {
@@ -98,9 +96,26 @@ void MainWindow::open_new_tab() {
 }
 
 void MainWindow::close_tab(int index) {
-    if (ui->tab_widget->count()) {
-        ui->tab_widget->removeTab(index);
+
+    if (!ui->tab_widget->count()) {
+        return;
     }
+
+    auto cur_editor = dynamic_cast<CodeEditor*>(ui->tab_widget->currentWidget());
+
+    bool file_opened = cur_editor->get_file_name().has_value();
+    if (file_opened) {
+        bool is_edited = cur_editor->document()->isModified();
+
+        if (is_edited) {
+             const auto ret = QMessageBox::question(this, "File opening", "Do you want to save changes?", QMessageBox::No, QMessageBox::Yes);
+            if (ret == QMessageBox::Yes) {
+                save_file(cur_editor->get_file_name().value());
+            }
+        }
+    }
+    
+    ui->tab_widget->removeTab(index);
 }
 
 void MainWindow::next_tab() {
@@ -151,19 +166,9 @@ void MainWindow::ask_save_file() {
         }
     }
 
-    QFile file(file_name);
+    save_file(file_name);
 
-    if (!file.open(QIODevice::WriteOnly)) {
-        QMessageBox::critical(this, "Error", "Can't open file", QMessageBox::Ok);
-        return;
-    }
-
-    file.write(dynamic_cast<QPlainTextEdit*>(ui->tab_widget->currentWidget())->toPlainText().toUtf8());
-
-    file.close();
-
-    const int cur_tab_ind = ui->tab_widget->currentIndex();
-    ui->tab_widget->setTabText(cur_tab_ind, QFileInfo(file.fileName()).fileName());
+    
 }
 
 void MainWindow::open_fs_file() {
@@ -181,13 +186,15 @@ void MainWindow::open_fs_file() {
 
 }
 
-void MainWindow::open_folder() {
+void MainWindow::ask_open_folder() {
     const QString folder_path = QFileDialog::getExistingDirectory(this, "Open folder", "");
     if (folder_path.isEmpty()) {
         return;
     }
 
-    ui->tree_view->setRootIndex(fs_model->index(folder_path));
+    open_folder(folder_path);
+
+    
 }
 
 void MainWindow::show_fs_context_menu(const QPoint &point) {
@@ -207,15 +214,45 @@ void MainWindow::open_file(const QString &file_name) {
 
     file.close();
 
-    if (!ui->tab_widget->count()) {
-        open_new_tab();
-    }
+    open_new_tab();
 
     auto cur_editor = dynamic_cast<CodeEditor*>(ui->tab_widget->currentWidget());
 
     cur_editor->setPlainText(file_contents);
     cur_editor->set_file_name(file.fileName());
+    cur_editor->document()->setModified(false);
 
     const int cur_tab_ind = ui->tab_widget->currentIndex();
     ui->tab_widget->setTabText(cur_tab_ind, QFileInfo(file.fileName()).fileName());
+}
+
+void MainWindow::save_file(const QString &file_name) {
+    QFile file(file_name);
+
+    if (!file.open(QIODevice::WriteOnly)) {
+        QMessageBox::critical(this, "Error", "Can't open file", QMessageBox::Ok);
+        return;
+    }
+
+    file.write(dynamic_cast<QPlainTextEdit*>(ui->tab_widget->currentWidget())->toPlainText().toUtf8());
+
+    file.close();
+
+    const int cur_tab_ind = ui->tab_widget->currentIndex();
+    ui->tab_widget->setTabText(cur_tab_ind, QFileInfo(file.fileName()).fileName());
+
+    dynamic_cast<CodeEditor*>(ui->tab_widget->currentWidget())->document()->setModified(false);
+}
+
+void MainWindow::open_folder(const QString &folder_name) {
+    if (!is_folder_opened) {
+        ui->tree_view->setModel(fs_model);
+        is_folder_opened = false;
+
+        for (int i = 1; i < fs_model->columnCount(); ++i) {
+            ui->tree_view->setColumnHidden(i, true);
+        }
+    }
+
+    ui->tree_view->setRootIndex(fs_model->index(folder_name));
 }

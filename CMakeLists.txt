@@ -21,6 +21,9 @@ file(GLOB_RECURSE app_ui  "${CMAKE_CURRENT_SOURCE_DIR}/app/cpp/*.ui")
 file(GLOB_RECURSE qsourcehighlite_inc "${CMAKE_CURRENT_SOURCE_DIR}/QSourceHighlite/*.hpp")
 file(GLOB_RECURSE qsourcehighlite_cpp "${CMAKE_CURRENT_SOURCE_DIR}/QSourceHighlite/*.cpp")
 
+file(GLOB_RECURSE qlightterminal_inc "${CMAKE_CURRENT_SOURCE_DIR}/QLightTerminal/*.hpp")
+file(GLOB_RECURSE qlightterminal_cpp "${CMAKE_CURRENT_SOURCE_DIR}/QLightTerminal/*.cpp")
+
 set(PROJECT_SOURCES
         ${app_inc}
         ${app_src}
@@ -28,6 +31,8 @@ set(PROJECT_SOURCES
 
         ${qsourcehighlite_inc}
         ${qsourcehighlite_cpp}
+        ${qlightterminal_inc}
+        ${qlightterminal_cpp}
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -49,6 +54,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/app/cpp/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/app/cpp/ui"
     "${CMAKE_CURRENT_SOURCE_DIR}/QSourceHighlite"
+    "${CMAKE_CURRENT_SOURCE_DIR}/QLightTerminal"
 )
 
 target_link_libraries(corgide PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)

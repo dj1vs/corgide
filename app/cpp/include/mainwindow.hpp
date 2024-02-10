@@ -23,6 +23,7 @@ public:
 private slots:
     void open_new_tab();
     void close_tab(int index);
+    void close_current_tab();
     void next_tab();
     void prev_tab();
 
@@ -32,12 +33,11 @@ private slots:
     void ask_create_file();
     void ask_delete_file();
 
-    void open_fs_file();
-
     void ask_open_folder();
 
-    void show_fs_context_menu(const QPoint &point);
+    void open_folder_file();
 
+    void show_folder_context_menu(const QPoint &point) const;
 private:
     void open_file(const QString &file_name);
     void save_file(const QString &file_name);
@@ -52,15 +52,17 @@ private:
     void write_settings();
     void read_settings();
 
+    void setup_folder_context_menu();
+
 private:
     Ui::MainWindow *ui;
 
     QFileSystemModel *fs_model;
 
-    QMenu *fs_context_menu;
-    QAction *fs_open_file_action;
-    QAction *fs_create_file_action;
-    QAction *fs_delete_file_action;
+    QMenu *folder_context_menu;
+    QAction *folder_open_file_action;
+    QAction *folder_create_file_action;
+    QAction *folder_delete_file_action;
 
     bool is_folder_opened = false;
 };

@@ -25,32 +25,9 @@ MainWindow::MainWindow(QWidget *parent)
     fs_model = new QFileSystemModel;
     fs_model->setRootPath(QDir::root().absolutePath());
 
-    fs_context_menu = new QMenu;
-    fs_open_file_action = new QAction("Open file");
-    fs_create_file_action = new QAction("New file");
-    fs_delete_file_action = new QAction("Delete file");
+    connect(ui->tree_view, &QTreeView::doubleClicked, this, &MainWindow::open_folder_file);
 
-    fs_context_menu->addAction(fs_open_file_action);
-    fs_context_menu->addAction(fs_create_file_action);
-    fs_context_menu->addAction(fs_delete_file_action);
-
-    connect(fs_open_file_action, &QAction::triggered, this, &MainWindow::open_fs_file);
-    connect(fs_create_file_action, &QAction::triggered, this, &MainWindow::ask_create_file);
-    connect(fs_delete_file_action, &QAction::triggered, this, &MainWindow::ask_delete_file);
-
-    connect(ui->tree_view, &QTreeView::doubleClicked, this, &MainWindow::open_fs_file);
-
-    connect(ui->tree_view, &QTreeView::customContextMenuRequested, this, &MainWindow::show_fs_context_menu);
-
-    connect(ui->tab_widget,         &QTabWidget::tabCloseRequested, this, &MainWindow::close_tab    );
-
-    connect(ui->new_tab_action,     &QAction::triggered,            this, &MainWindow::open_new_tab );
-    connect(ui->close_tab_action,   &QAction::triggered,            this, &MainWindow::close_tab    );
-    connect(ui->next_tab_action,    &QAction::triggered,            this, &MainWindow::next_tab     );
-    connect(ui->prev_tab_action,    &QAction::triggered,            this, &MainWindow::prev_tab     );
-    connect(ui->open_file_action,   &QAction::triggered,            this, &MainWindow::ask_open_file    );
-    connect(ui->save_file_action,   &QAction::triggered,            this, &MainWindow::ask_save_file);
-    connect(ui->open_folder_action, &QAction::triggered,            this, &MainWindow::ask_open_folder  );
+    connect(ui->tab_widget, &QTabWidget::tabCloseRequested, this, &MainWindow::close_tab);
 
     read_settings();
 }
@@ -126,6 +103,10 @@ void MainWindow::close_tab(int index) {
     }
     
     ui->tab_widget->removeTab(index);
+}
+
+void MainWindow::close_current_tab() {
+    close_tab(ui->tab_widget->currentIndex());
 }
 
 void MainWindow::next_tab() {
@@ -213,7 +194,7 @@ void MainWindow::ask_delete_file() {
     
 }
 
-void MainWindow::open_fs_file() {
+void MainWindow::open_folder_file() {
     QModelIndexList fs_rows = ui->tree_view->selectionModel()->selectedRows();
     if (fs_rows.size() != 1) {
         return;
@@ -239,13 +220,14 @@ void MainWindow::ask_open_folder() {
     
 }
 
-void MainWindow::show_fs_context_menu(const QPoint &point) {
-    fs_context_menu->exec(ui->tree_view->viewport()->mapToGlobal(point));
+void MainWindow::show_folder_context_menu(const QPoint &point) const {
+    folder_context_menu->exec(ui->tree_view->viewport()->mapToGlobal(point));
 
 }
 
 void MainWindow::open_file(const QString &file_name) {
     const int tabs_amount = ui->tab_widget->count();
+
     for (int i = 0; i < tabs_amount; ++i) {
         auto tab_editor = dynamic_cast<CodeEditor*>(ui->tab_widget->widget(i));
         std::optional<QString> editor_file_name = tab_editor->get_file_name();
@@ -403,5 +385,22 @@ void MainWindow::read_settings() {
 
         ui->tab_widget->setTabText(ui->tab_widget->count() - 1, tab_name); 
     }
+}
 
+void MainWindow::setup_folder_context_menu() {
+    folder_context_menu = new QMenu;
+
+    folder_open_file_action = new QAction("Open file");
+    folder_create_file_action = new QAction("New file");
+    folder_delete_file_action = new QAction("Delete file");
+
+    folder_context_menu->addAction(folder_open_file_action);
+    folder_context_menu->addAction(folder_create_file_action);
+    folder_context_menu->addAction(folder_delete_file_action);
+
+    connect(folder_open_file_action, &QAction::triggered, this, &MainWindow::open_folder_file);
+    connect(folder_create_file_action, &QAction::triggered, this, &MainWindow::ask_create_file);
+    connect(folder_delete_file_action, &QAction::triggered, this, &MainWindow::ask_delete_file);
+
+    connect(ui->tree_view, &QTreeView::customContextMenuRequested, this, &MainWindow::show_folder_context_menu);
 }

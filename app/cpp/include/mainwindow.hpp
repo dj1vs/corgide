@@ -29,6 +29,8 @@ private slots:
     void ask_open_file();
     void ask_save_file();
 
+    void ask_create_file();
+
     void open_fs_file();
 
     void ask_open_folder();
@@ -39,7 +41,11 @@ private:
     void open_file(const QString &file_name);
     void save_file(const QString &file_name);
 
+    void create_file(const QString &file_name);
+
     void open_folder(const QString &folder_name);
+
+    QString get_opened_folder() const;
 
     void write_settings();
     void read_settings();
@@ -51,6 +57,7 @@ private:
 
     QMenu *fs_context_menu;
     QAction *fs_open_file_action;
+    QAction *fs_create_file_action;
 
     bool is_folder_opened = false;
 };

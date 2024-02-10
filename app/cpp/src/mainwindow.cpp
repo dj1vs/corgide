@@ -11,6 +11,7 @@
 #include <QMenu>
 #include <QModelIndexList>
 #include <QSettings>
+#include <QInputDialog>
 
 #include "qsourcehighliter.h"
 
@@ -26,10 +27,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     fs_context_menu = new QMenu;
     fs_open_file_action = new QAction("Open file");
+    fs_create_file_action = new QAction("New file");
 
     fs_context_menu->addAction(fs_open_file_action);
+    fs_context_menu->addAction(fs_create_file_action);
 
     connect(fs_open_file_action, &QAction::triggered, this, &MainWindow::open_fs_file);
+    connect(fs_create_file_action, &QAction::triggered, this, &MainWindow::ask_create_file);
+
     connect(ui->tree_view, &QTreeView::doubleClicked, this, &MainWindow::open_fs_file);
 
     connect(ui->tree_view, &QTreeView::customContextMenuRequested, this, &MainWindow::show_fs_context_menu);
@@ -173,6 +178,14 @@ void MainWindow::ask_save_file() {
     
 }
 
+void MainWindow::ask_create_file() {
+    bool ok;
+    const QString new_file_name = QInputDialog::getText(this, "New file", "New file name", QLineEdit::Normal, QString(), &ok);
+    if (ok) {
+        create_file(new_file_name);
+    }
+}
+
 void MainWindow::open_fs_file() {
     QModelIndexList fs_rows = ui->tree_view->selectionModel()->selectedRows();
     if (fs_rows.size() != 1) {
@@ -256,6 +269,16 @@ void MainWindow::save_file(const QString &file_name) {
     dynamic_cast<CodeEditor*>(ui->tab_widget->currentWidget())->document()->setModified(false);
 }
 
+void MainWindow::create_file(const QString &file_name) {
+    const QString folder_path = get_opened_folder();
+    if (folder_path == "") {
+        return;
+    }
+
+    QFile file(folder_path + '/' + file_name);
+    file.open(QIODevice::WriteOnly);
+}
+
 void MainWindow::open_folder(const QString &folder_name) {
     if (!is_folder_opened) {
         ui->tree_view->setModel(fs_model);
@@ -269,6 +292,12 @@ void MainWindow::open_folder(const QString &folder_name) {
 
     ui->tree_view->setRootIndex(fs_model->index(folder_name));
     ui->terminal->setDirectory(folder_name);
+
+    is_folder_opened = true;
+}
+
+QString MainWindow::get_opened_folder() const {
+    return fs_model->fileInfo(ui->tree_view->rootIndex()).absoluteFilePath();
 }
 
 void MainWindow::write_settings() {
@@ -281,7 +310,7 @@ void MainWindow::write_settings() {
     settings.setValue("tab_widget_height", ui->tab_widget->height());
 
     if (is_folder_opened) {
-        settings.setValue("folder", fs_model->fileInfo(ui->tree_view->rootIndex()).absoluteFilePath());
+        settings.setValue("folder", get_opened_folder());
     } else {
         settings.setValue("folder", "-");
     }
@@ -321,7 +350,6 @@ void MainWindow::read_settings() {
     const QString folder = settings.value("folder", "-").toString();
     if (folder != "-") {
         open_folder(folder);
-        is_folder_opened = true;
     }
 
     const QStringList opened_tabs = settings.value("opened_tabs", "").toString().split(';');

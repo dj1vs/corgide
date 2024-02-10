@@ -186,7 +186,7 @@ void MainWindow::open_fs_file() {
     const QString file_path = fs_model->filePath(selected_row);
 
     if (QFileInfo(file_path).isFile()) {
-        open_file(file_path);\
+        open_file(file_path);
     }
 }
 
@@ -207,6 +207,16 @@ void MainWindow::show_fs_context_menu(const QPoint &point) {
 }
 
 void MainWindow::open_file(const QString &file_name) {
+    const int tabs_amount = ui->tab_widget->count();
+    for (int i = 0; i < tabs_amount; ++i) {
+        auto tab_editor = dynamic_cast<CodeEditor*>(ui->tab_widget->widget(i));
+        std::optional<QString> editor_file_name = tab_editor->get_file_name();
+        if (editor_file_name.has_value() && editor_file_name.value() == file_name) {
+            ui->tab_widget->setCurrentIndex(i);
+            return;
+        }
+    }
+
     QFile file(file_name);
 
     if (!file.open(QIODevice::ReadOnly)) {

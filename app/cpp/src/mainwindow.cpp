@@ -28,12 +28,15 @@ MainWindow::MainWindow(QWidget *parent)
     fs_context_menu = new QMenu;
     fs_open_file_action = new QAction("Open file");
     fs_create_file_action = new QAction("New file");
+    fs_delete_file_action = new QAction("Delete file");
 
     fs_context_menu->addAction(fs_open_file_action);
     fs_context_menu->addAction(fs_create_file_action);
+    fs_context_menu->addAction(fs_delete_file_action);
 
     connect(fs_open_file_action, &QAction::triggered, this, &MainWindow::open_fs_file);
     connect(fs_create_file_action, &QAction::triggered, this, &MainWindow::ask_create_file);
+    connect(fs_delete_file_action, &QAction::triggered, this, &MainWindow::ask_delete_file);
 
     connect(ui->tree_view, &QTreeView::doubleClicked, this, &MainWindow::open_fs_file);
 
@@ -186,6 +189,30 @@ void MainWindow::ask_create_file() {
     }
 }
 
+void MainWindow::ask_delete_file() {
+    QModelIndexList fs_rows = ui->tree_view->selectionModel()->selectedRows();
+    if (fs_rows.size() != 1) {
+        return;
+    }
+
+    QModelIndex selected_row = fs_rows.front();
+
+    const QString file_path = fs_model->filePath(selected_row);
+
+    if (!QFileInfo(file_path).isFile()) {
+        return;
+    }
+
+    const QString file_name = QFileInfo(file_path).fileName();
+
+    const auto ret = QMessageBox::critical(this, "Delete file", "Do you really want to delete " + file_name + "?", QMessageBox::No, QMessageBox::Yes);
+    if (ret == QMessageBox::Yes) {
+        delete_file(file_path);
+    }
+
+    
+}
+
 void MainWindow::open_fs_file() {
     QModelIndexList fs_rows = ui->tree_view->selectionModel()->selectedRows();
     if (fs_rows.size() != 1) {
@@ -277,6 +304,11 @@ void MainWindow::create_file(const QString &file_name) {
 
     QFile file(folder_path + '/' + file_name);
     file.open(QIODevice::WriteOnly);
+}
+
+void MainWindow::delete_file(const QString &file_path) {
+    QFile file(file_path);
+    file.remove();
 }
 
 void MainWindow::open_folder(const QString &folder_name) {

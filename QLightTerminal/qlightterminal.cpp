@@ -7,6 +7,7 @@
 #include <QByteArray>
 #include <QTextCursor>
 #include <QPainter>
+#include <QString>
 #include <QKeyEvent>
 #include <QPoint>
 #include <QLayout>
@@ -58,6 +59,15 @@ QLightTerminal::QLightTerminal(QWidget *parent) : QWidget(parent), scrollbar(Qt:
 
     // connect close event of the tty
     connect(st, &SimpleTerminal::s_closed, this, &QLightTerminal::close);
+}
+
+// corgide code
+void QLightTerminal::setDirectory(const QString &folder_path) {
+    const QString cd_command = "cd " + folder_path + '\n';
+    const char* clear_command = "clear\n";
+
+    st->ttywriteraw(cd_command.toStdString().c_str(), cd_command.size());
+    st->ttywriteraw(clear_command, strlen(clear_command));
 }
 
 void QLightTerminal::close() {

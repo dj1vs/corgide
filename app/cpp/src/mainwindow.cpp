@@ -270,6 +270,7 @@ void MainWindow::open_folder(const QString &folder_name) {
     }
 
     ui->tree_view->setRootIndex(fs_model->index(folder_name));
+    ui->terminal->setDirectory(folder_name);
 }
 
 void MainWindow::write_settings() {

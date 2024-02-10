@@ -63,7 +63,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QLightTerminal" name="widget" native="true">
+      <widget class="QLightTerminal" name="terminal" native="true">
        <property name="minimumSize">
         <size>
          <width>500</width>

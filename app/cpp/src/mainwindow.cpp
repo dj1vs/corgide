@@ -284,6 +284,25 @@ void MainWindow::write_settings() {
     } else {
         settings.setValue("folder", "-");
     }
+
+    // tab-to-file
+    QString opened_tabs_str;
+    const int tabs_amount = ui->tab_widget->count();
+    for (int i = 0; i < tabs_amount; ++i) {
+        const auto tab_editor = dynamic_cast<CodeEditor*>(ui->tab_widget->widget(i));
+        const auto tab_name = ui->tab_widget->tabText(i);
+        const auto tab_file = tab_editor->get_file_name();
+
+        opened_tabs_str += tab_name + ':';
+
+        if (tab_file.has_value()) {
+            opened_tabs_str += tab_file.value() + ';';
+        } else {
+            opened_tabs_str += "-;";
+        }
+    }
+
+    settings.setValue("opened_tabs", opened_tabs_str);
 }
 void MainWindow::read_settings() {
     QSettings settings(QApplication::organizationName(), QApplication::applicationName());
@@ -297,6 +316,26 @@ void MainWindow::read_settings() {
     if (folder != "-") {
         open_folder(folder);
         is_folder_opened = true;
+    }
+
+    const QStringList opened_tabs = settings.value("opened_tabs", "").toString().split(';');
+    for (const auto opened_tab: opened_tabs) {
+        const auto opened_tab_split = opened_tab.split(':');
+
+        if (opened_tab_split.size() != 2) {
+            continue;
+        }
+
+        const auto tab_name = opened_tab_split[0];
+        const auto file_name = opened_tab_split[1];
+
+        if (file_name != "-") {
+            open_file(file_name);
+        } else {
+            open_new_tab();
+        }
+
+        ui->tab_widget->setTabText(ui->tab_widget->count() - 1, tab_name);
     }
 
 }

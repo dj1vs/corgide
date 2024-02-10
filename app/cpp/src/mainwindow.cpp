@@ -21,8 +21,6 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
-    ui->tab_widget->setTabsClosable(true);
-
     fs_model = new QFileSystemModel;
     fs_model->setRootPath(QDir::root().absolutePath());
 
@@ -279,6 +277,9 @@ void MainWindow::write_settings() {
     settings.setValue("tree_view_width", ui->tree_view->width());
     settings.setValue("tab_widget_width", ui->tab_widget->width());
 
+    settings.setValue("terminal_height", ui->terminal->height());
+    settings.setValue("tab_widget_height", ui->tab_widget->height());
+
     if (is_folder_opened) {
         settings.setValue("folder", fs_model->fileInfo(ui->tree_view->rootIndex()).absoluteFilePath());
     } else {
@@ -310,7 +311,12 @@ void MainWindow::read_settings() {
     const int tree_view_width = settings.value("tree_view_width", "100").toInt();
     const int tab_widget_width = settings.value("tab_widget_width", "500").toInt();
 
-    ui->splitter->setSizes({tree_view_width, tab_widget_width});
+    const int terminal_height = settings.value("terminal_height", "200").toInt();
+    const int tab_widget_height = settings.value("tab_widget_height", "400").toInt();
+
+
+    ui->folder_editor_splitter->setSizes({tree_view_width, tab_widget_width});
+    ui->terminal_splitter->setSizes({tab_widget_height, terminal_height});
 
     const QString folder = settings.value("folder", "-").toString();
     if (folder != "-") {
@@ -335,7 +341,7 @@ void MainWindow::read_settings() {
             open_new_tab();
         }
 
-        ui->tab_widget->setTabText(ui->tab_widget->count() - 1, tab_name);
+        ui->tab_widget->setTabText(ui->tab_widget->count() - 1, tab_name); 
     }
 
 }

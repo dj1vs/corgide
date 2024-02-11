@@ -14,6 +14,7 @@
 #include <QInputDialog>
 
 #include "qsourcehighliter.h"
+#include "fs.hpp"
 
 #include "codeeditor.hpp"
 #include "preferenceswidget.hpp"
@@ -184,7 +185,7 @@ void MainWindow::ask_rename_file() {
     const QString new_name = QInputDialog::getText(this, "Pick a new file name", "New name", QLineEdit::Normal, file_name, &ok);
 
     if (ok && !new_name.isEmpty()) {
-        rename_file(file_path, new_name);
+        rename_file(file_path, QFileInfo(file_path).absoluteDir().absolutePath() + '/' + new_name);
     }
 }
 
@@ -192,7 +193,13 @@ void MainWindow::ask_create_file() {
     bool ok;
     const QString new_file_name = QInputDialog::getText(this, "New file", "New file name", QLineEdit::Normal, QString(), &ok);
     if (ok) {
-        create_file(new_file_name);
+        const QString opened_folder = get_opened_folder();
+
+        if (opened_folder.isEmpty()) {
+            return;
+        }
+
+        create_file(opened_folder + "/" + new_file_name);
     }
 }
 
@@ -214,7 +221,7 @@ void MainWindow::ask_delete_file() {
 
     const auto ret = QMessageBox::critical(this, "Delete file", "Do you really want to delete " + file_name + "?", QMessageBox::No, QMessageBox::Yes);
     if (ret == QMessageBox::Yes) {
-        delete_file(file_path);
+        remove_file(file_path);
     }
 
     
@@ -320,34 +327,6 @@ void MainWindow::save_file(const QString &file_name) {
     ui->tab_widget->setTabText(cur_tab_ind, QFileInfo(file.fileName()).fileName());
 
     get_cur_editor()->document()->setModified(false);
-}
-
-void MainWindow::create_file(const QString &file_name) {
-    const QString folder_path = get_opened_folder();
-    if (folder_path == "") {
-        return;
-    }
-
-    QFile file(folder_path + '/' + file_name);
-    file.open(QIODevice::WriteOnly);
-}
-
-void MainWindow::delete_file(const QString &file_path) {
-    QFile file(file_path);
-    file.remove();
-}
-
-void MainWindow::rename_file(const QString &file_path, const QString &new_name) {
-    QFile file(file_path);
-
-    const QString new_file_name = QFileInfo(file_path).absoluteDir().absolutePath() + '/' + new_name;
-
-    bool success { file.rename(new_file_name) };
-
-    if (!success) {
-        const QString err_msg = "Can't rename file\n" + file.errorString();
-        QMessageBox::critical(this, "Error", err_msg, QMessageBox::Ok);
-    }
 }
 
 void MainWindow::open_folder(const QString &folder_name) {

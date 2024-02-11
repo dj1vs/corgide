@@ -50,11 +50,6 @@ private:
     void open_file(const QString &file_name);
     void save_file(const QString &file_name);
 
-    void create_file(const QString &file_name);
-    void delete_file(const QString &file_path);
-
-    void rename_file(const QString &file_path, const QString &new_name);
-
     void open_folder(const QString &folder_name);
 
     QString get_opened_folder() const;

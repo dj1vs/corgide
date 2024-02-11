@@ -46,6 +46,8 @@ class QLightTerminal : public QWidget {
 public:
     QLightTerminal(QWidget *parent = nullptr);
 
+    void runCommand(const QString &command);
+
     void setDirectory(const QString &folder_path);
 
 public

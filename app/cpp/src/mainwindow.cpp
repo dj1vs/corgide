@@ -235,11 +235,22 @@ void MainWindow::open_folder_file() {
     }
 }
 
-void MainWindow::open_preferences() {
-    PreferencesWidget *preferences = new PreferencesWidget();
-    preferences->setAttribute(Qt::WA_DeleteOnClose);
+void MainWindow::compile() {
+    const auto cur_editor = get_cur_editor();
 
-    preferences->show();
+    std::optional<QString> file_name = cur_editor->get_file_name();
+    if (!file_name.has_value()) {
+        return; 
+    }
+
+    ui->terminal->runCommand(preferences.compiler_path + ' ' + file_name.value() + " -o " + QFileInfo(file_name.value()).baseName() + '\n');
+}
+
+void MainWindow::open_preferences() {
+    PreferencesWidget *preferences_widget = new PreferencesWidget(&preferences);
+    preferences_widget->setAttribute(Qt::WA_DeleteOnClose);
+
+    preferences_widget->show();
 }
 
 void MainWindow::ask_open_folder() {
@@ -393,25 +404,33 @@ void MainWindow::write_settings() {
     }
 
     settings.setValue("opened_tabs", opened_tabs_str);
+
+    // compiler
+
+    settings.beginGroup("compiler");
+
+    settings.setValue("compiler_path", preferences.compiler_path);
 }
 void MainWindow::read_settings() {
     QSettings settings(QApplication::organizationName(), QApplication::applicationName());
 
+    // setup widget sizes
     const int tree_view_width = settings.value("tree_view_width", "100").toInt();
     const int tab_widget_width = settings.value("tab_widget_width", "500").toInt();
 
     const int terminal_height = settings.value("terminal_height", "200").toInt();
     const int tab_widget_height = settings.value("tab_widget_height", "400").toInt();
 
-
     ui->folder_editor_splitter->setSizes({tree_view_width, tab_widget_width});
     ui->terminal_splitter->setSizes({tab_widget_height, terminal_height});
 
+    // setup folder
     const QString folder = settings.value("folder", "-").toString();
     if (folder != "-") {
         open_folder(folder);
     }
 
+    // setup opened tabs
     const QStringList opened_tabs = settings.value("opened_tabs", "").toString().split(';');
     for (const auto opened_tab: opened_tabs) {
         const auto opened_tab_split = opened_tab.split(':');
@@ -431,6 +450,11 @@ void MainWindow::read_settings() {
 
         ui->tab_widget->setTabText(ui->tab_widget->count() - 1, tab_name); 
     }
+
+    // setup compiler settings
+    settings.beginGroup("compiler");
+
+    preferences.compiler_path = settings.value("compiler_path", "/usr/bin/gcc").toString();
 }
 
 CodeEditor* MainWindow::get_cur_editor() const {

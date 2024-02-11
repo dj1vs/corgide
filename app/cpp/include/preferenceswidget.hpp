@@ -2,15 +2,24 @@
 
 #include <QWidget>
 
+#include "ds.hpp"
+
 QT_BEGIN_NAMESPACE
-class Ui_preferences_widget;
+namespace Ui {class PreferencesWidget;};
+class QShortcut;
 QT_END_NAMESPACE
 
 class PreferencesWidget : public QWidget {
     Q_OBJECT;
 public:
-    PreferencesWidget(QWidget *parent = nullptr);
+    PreferencesWidget(Preferences *preferences, QWidget *parent = nullptr);
     ~PreferencesWidget();
+private slots:
+    void save();
 private:
-    Ui_preferences_widget *ui;
+    Ui::PreferencesWidget *ui;
+
+    QShortcut *save_shortcut;
+
+    Preferences *preferences;
 };

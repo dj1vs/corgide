@@ -1,0 +1,4 @@
+- [ ] Colorize matching brackets
+- [ ] Autocomplete brackets
+- [ ] Change editor font
+- [ ] Change editor colors

@@ -104,15 +104,22 @@
     <addaction name="next_tab_action"/>
     <addaction name="prev_tab_action"/>
    </widget>
-   <widget class="QMenu" name="menuFolder">
+   <widget class="QMenu" name="folder_menu">
     <property name="title">
      <string>Folder</string>
     </property>
     <addaction name="open_folder_action"/>
    </widget>
+   <widget class="QMenu" name="run_menu">
+    <property name="title">
+     <string>Run</string>
+    </property>
+    <addaction name="compile_action"/>
+   </widget>
    <addaction name="file_menu"/>
    <addaction name="tab_menu"/>
-   <addaction name="menuFolder"/>
+   <addaction name="folder_menu"/>
+   <addaction name="run_menu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="open_file_action">
@@ -174,6 +181,11 @@
   <action name="open_preferences_action">
    <property name="text">
     <string>Preferences</string>
+   </property>
+  </action>
+  <action name="compile_action">
+   <property name="text">
+    <string>Compile</string>
    </property>
   </action>
  </widget>
@@ -315,6 +327,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>compile_action</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>compile()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>427</x>
+     <y>315</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>open_new_tab()</slot>
@@ -325,5 +353,6 @@
   <slot>ask_save_file()</slot>
   <slot>ask_open_folder()</slot>
   <slot>open_preferences()</slot>
+  <slot>compile()</slot>
  </slots>
 </ui>

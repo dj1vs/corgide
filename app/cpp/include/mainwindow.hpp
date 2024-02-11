@@ -2,6 +2,8 @@
 
 #include <QMainWindow>
 
+#include "ds.hpp"
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 class QFileSystemModel;
@@ -39,6 +41,8 @@ private slots:
 
     void open_folder_file();
 
+    void compile();
+
     void open_preferences();
 
     void show_folder_context_menu(const QPoint &point) const;
@@ -74,6 +78,7 @@ private:
     QAction *folder_delete_file_action;
     QAction *folder_rename_file_action;
 
+    Preferences preferences;
+
     bool is_folder_opened = false;
 };
-

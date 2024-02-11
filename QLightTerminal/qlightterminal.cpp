@@ -67,6 +67,10 @@ void QLightTerminal::setDirectory(const QString &folder_path) {
     st->ttywriteraw(cd_command.toStdString().c_str(), cd_command.size());
 }
 
+void QLightTerminal::runCommand(const QString &command) {
+    st->ttywriteraw(command.toStdString().c_str(), command.size());
+}
+
 void QLightTerminal::close() {
     setDisabled(true);
     closed = true;

@@ -1,15 +1,15 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 #include <QMainWindow>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
-class CodeEditor;
 class QFileSystemModel;
 class QAction;
 class QMenu;
 class QShowEvent;
+class CodeEditor;
+class QVariant;
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
@@ -30,12 +30,16 @@ private slots:
     void ask_open_file();
     void ask_save_file();
 
+    void ask_rename_file();
+
     void ask_create_file();
     void ask_delete_file();
 
     void ask_open_folder();
 
     void open_folder_file();
+
+    void open_preferences();
 
     void show_folder_context_menu(const QPoint &point) const;
 private:
@@ -45,12 +49,17 @@ private:
     void create_file(const QString &file_name);
     void delete_file(const QString &file_path);
 
+    void rename_file(const QString &file_path, const QString &new_name);
+
     void open_folder(const QString &folder_name);
 
     QString get_opened_folder() const;
 
     void write_settings();
     void read_settings();
+
+    CodeEditor* get_cur_editor() const;
+    CodeEditor *get_tab_editor(uint8_t tab_ind) const;
 
     void setup_folder_context_menu();
 
@@ -63,7 +72,8 @@ private:
     QAction *folder_open_file_action;
     QAction *folder_create_file_action;
     QAction *folder_delete_file_action;
+    QAction *folder_rename_file_action;
 
     bool is_folder_opened = false;
 };
-#endif // MAINWINDOW_H
+

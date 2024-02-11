@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>813</width>
-    <height>654</height>
+    <width>856</width>
+    <height>631</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -83,7 +83,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>813</width>
+     <width>856</width>
      <height>26</height>
     </rect>
    </property>
@@ -93,6 +93,7 @@
     </property>
     <addaction name="open_file_action"/>
     <addaction name="save_file_action"/>
+    <addaction name="open_preferences_action"/>
    </widget>
    <widget class="QMenu" name="tab_menu">
     <property name="title">
@@ -116,7 +117,7 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="open_file_action">
    <property name="text">
-    <string>Open file</string>
+    <string>Open</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -124,7 +125,7 @@
   </action>
   <action name="save_file_action">
    <property name="text">
-    <string>Save file</string>
+    <string>Save</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
@@ -168,6 +169,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+K, Ctrl+O</string>
+   </property>
+  </action>
+  <action name="open_preferences_action">
+   <property name="text">
+    <string>Preferences</string>
    </property>
   </action>
  </widget>
@@ -293,6 +299,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>open_preferences_action</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>open_preferences()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>427</x>
+     <y>315</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>open_new_tab()</slot>
@@ -302,5 +324,6 @@
   <slot>ask_open_file()</slot>
   <slot>ask_save_file()</slot>
   <slot>ask_open_folder()</slot>
+  <slot>open_preferences()</slot>
  </slots>
 </ui>

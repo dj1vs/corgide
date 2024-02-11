@@ -16,6 +16,7 @@
 #include "qsourcehighliter.h"
 
 #include "codeeditor.hpp"
+#include "preferenceswidget.hpp"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -24,6 +25,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     fs_model = new QFileSystemModel;
     fs_model->setRootPath(QDir::root().absolutePath());
+
+    setup_folder_context_menu();
 
     connect(ui->tree_view, &QTreeView::doubleClicked, this, &MainWindow::open_folder_file);
 
@@ -88,7 +91,7 @@ void MainWindow::close_tab(int index) {
         return;
     }
 
-    auto cur_editor = dynamic_cast<CodeEditor*>(ui->tab_widget->currentWidget());
+    auto cur_editor = get_cur_editor();
 
     bool file_opened = cur_editor->get_file_name().has_value();
     if (file_opened) {
@@ -135,7 +138,6 @@ void MainWindow::ask_open_file() {
     QString file_name_filter = "";
     const QString file_name = QFileDialog::getOpenFileName(this, "Choose file to open", "", "", &file_name_filter);
     if (!file_name.length()) {
-        QMessageBox::warning(this, "Warning", "File was not selected", QMessageBox::Ok);
         return;
     } 
 
@@ -145,7 +147,7 @@ void MainWindow::ask_open_file() {
 void MainWindow::ask_save_file() {
     QString file_name;
 
-    auto cur_editor = dynamic_cast<CodeEditor*>(ui->tab_widget->currentWidget());
+    auto cur_editor = get_cur_editor();
     if (cur_editor->get_file_name().has_value()) {
         file_name = cur_editor->get_file_name().value();
     } else {
@@ -160,6 +162,30 @@ void MainWindow::ask_save_file() {
     save_file(file_name);
 
     
+}
+
+void MainWindow::ask_rename_file() {
+    QModelIndexList fs_rows = ui->tree_view->selectionModel()->selectedRows();
+    if (fs_rows.size() != 1) {
+        return;
+    }
+
+    QModelIndex selected_row = fs_rows.front();
+
+    const QString file_path = fs_model->filePath(selected_row);
+
+    if (!QFileInfo(file_path).isFile()) {
+        return;
+    }
+
+    const QString file_name = QFileInfo(file_path).fileName();
+
+    bool ok;
+    const QString new_name = QInputDialog::getText(this, "Pick a new file name", "New name", QLineEdit::Normal, file_name, &ok);
+
+    if (ok && !new_name.isEmpty()) {
+        rename_file(file_path, new_name);
+    }
 }
 
 void MainWindow::ask_create_file() {
@@ -209,6 +235,13 @@ void MainWindow::open_folder_file() {
     }
 }
 
+void MainWindow::open_preferences() {
+    PreferencesWidget *preferences = new PreferencesWidget();
+    preferences->setAttribute(Qt::WA_DeleteOnClose);
+
+    preferences->show();
+}
+
 void MainWindow::ask_open_folder() {
     const QString folder_path = QFileDialog::getExistingDirectory(this, "Open folder", "");
     if (folder_path.isEmpty()) {
@@ -229,7 +262,7 @@ void MainWindow::open_file(const QString &file_name) {
     const int tabs_amount = ui->tab_widget->count();
 
     for (int i = 0; i < tabs_amount; ++i) {
-        auto tab_editor = dynamic_cast<CodeEditor*>(ui->tab_widget->widget(i));
+        auto tab_editor = get_tab_editor(i);
         std::optional<QString> editor_file_name = tab_editor->get_file_name();
         if (editor_file_name.has_value() && editor_file_name.value() == file_name) {
             ui->tab_widget->setCurrentIndex(i);
@@ -250,7 +283,7 @@ void MainWindow::open_file(const QString &file_name) {
 
     open_new_tab();
 
-    auto cur_editor = dynamic_cast<CodeEditor*>(ui->tab_widget->currentWidget());
+    auto cur_editor = get_cur_editor();
 
     cur_editor->setPlainText(file_contents);
     cur_editor->set_file_name(file.fileName());
@@ -268,14 +301,14 @@ void MainWindow::save_file(const QString &file_name) {
         return;
     }
 
-    file.write(dynamic_cast<QPlainTextEdit*>(ui->tab_widget->currentWidget())->toPlainText().toUtf8());
+    file.write(get_cur_editor()->toPlainText().toUtf8());
 
     file.close();
 
     const int cur_tab_ind = ui->tab_widget->currentIndex();
     ui->tab_widget->setTabText(cur_tab_ind, QFileInfo(file.fileName()).fileName());
 
-    dynamic_cast<CodeEditor*>(ui->tab_widget->currentWidget())->document()->setModified(false);
+    get_cur_editor()->document()->setModified(false);
 }
 
 void MainWindow::create_file(const QString &file_name) {
@@ -291,6 +324,19 @@ void MainWindow::create_file(const QString &file_name) {
 void MainWindow::delete_file(const QString &file_path) {
     QFile file(file_path);
     file.remove();
+}
+
+void MainWindow::rename_file(const QString &file_path, const QString &new_name) {
+    QFile file(file_path);
+
+    const QString new_file_name = QFileInfo(file_path).absoluteDir().absolutePath() + '/' + new_name;
+
+    bool success { file.rename(new_file_name) };
+
+    if (!success) {
+        const QString err_msg = "Can't rename file\n" + file.errorString();
+        QMessageBox::critical(this, "Error", err_msg, QMessageBox::Ok);
+    }
 }
 
 void MainWindow::open_folder(const QString &folder_name) {
@@ -333,7 +379,7 @@ void MainWindow::write_settings() {
     QString opened_tabs_str;
     const int tabs_amount = ui->tab_widget->count();
     for (int i = 0; i < tabs_amount; ++i) {
-        const auto tab_editor = dynamic_cast<CodeEditor*>(ui->tab_widget->widget(i));
+        const auto tab_editor = get_tab_editor(i);
         const auto tab_name = ui->tab_widget->tabText(i);
         const auto tab_file = tab_editor->get_file_name();
 
@@ -387,20 +433,33 @@ void MainWindow::read_settings() {
     }
 }
 
+CodeEditor* MainWindow::get_cur_editor() const {
+    return dynamic_cast<CodeEditor*>(ui->tab_widget->currentWidget());
+}
+
+CodeEditor* MainWindow::get_tab_editor(uint8_t tab_ind) const {
+    return dynamic_cast<CodeEditor*>(ui->tab_widget->widget(tab_ind));
+}
+
 void MainWindow::setup_folder_context_menu() {
     folder_context_menu = new QMenu;
 
     folder_open_file_action = new QAction("Open file");
     folder_create_file_action = new QAction("New file");
     folder_delete_file_action = new QAction("Delete file");
+    folder_rename_file_action = new QAction("Rename file");
 
-    folder_context_menu->addAction(folder_open_file_action);
-    folder_context_menu->addAction(folder_create_file_action);
-    folder_context_menu->addAction(folder_delete_file_action);
+    folder_context_menu->addActions(
+        {
+            folder_open_file_action, folder_create_file_action,
+            folder_delete_file_action, folder_rename_file_action
+        }
+    );
 
-    connect(folder_open_file_action, &QAction::triggered, this, &MainWindow::open_folder_file);
+    connect(folder_open_file_action,   &QAction::triggered, this, &MainWindow::open_folder_file);
     connect(folder_create_file_action, &QAction::triggered, this, &MainWindow::ask_create_file);
     connect(folder_delete_file_action, &QAction::triggered, this, &MainWindow::ask_delete_file);
+    connect(folder_rename_file_action, &QAction::triggered, this, &MainWindow::ask_rename_file);
 
     connect(ui->tree_view, &QTreeView::customContextMenuRequested, this, &MainWindow::show_folder_context_menu);
 }

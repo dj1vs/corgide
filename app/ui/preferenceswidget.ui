@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>658</width>
-    <height>440</height>
+    <height>400</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,39 +24,107 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>638</width>
-        <height>420</height>
+        <width>642</width>
+        <height>384</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QGroupBox" name="groupBox">
-         <property name="title">
-          <string>Compiler</string>
+        <widget class="QTabWidget" name="tabWidget">
+         <property name="currentIndex">
+          <number>1</number>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
-            <item>
-             <widget class="QLabel" name="compiler_path_label">
-              <property name="text">
-               <string>Compiler path:</string>
+         <widget class="QWidget" name="tab">
+          <attribute name="title">
+           <string>Compiler</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <item>
+            <widget class="QScrollArea" name="scrollArea_2">
+             <property name="widgetResizable">
+              <bool>true</bool>
+             </property>
+             <widget class="QWidget" name="scrollAreaWidgetContents_2">
+              <property name="geometry">
+               <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>606</width>
+                <height>279</height>
+               </rect>
               </property>
+              <layout class="QVBoxLayout" name="verticalLayout_4">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_2">
+                 <item>
+                  <widget class="QLabel" name="compiler_path_label">
+                   <property name="text">
+                    <string>Compiler path:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="compiler_path_input"/>
+                 </item>
+                </layout>
+               </item>
+              </layout>
              </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="compiler_path_input"/>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <widget class="QPushButton" name="save_button">
-            <property name="text">
-             <string>Save</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tab_2">
+          <attribute name="title">
+           <string>View</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <item>
+            <widget class="QScrollArea" name="scrollArea_3">
+             <property name="widgetResizable">
+              <bool>true</bool>
+             </property>
+             <widget class="QWidget" name="scrollAreaWidgetContents_3">
+              <property name="geometry">
+               <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>606</width>
+                <height>279</height>
+               </rect>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_6">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout">
+                 <item>
+                  <widget class="QLabel" name="label">
+                   <property name="text">
+                    <string>Editor font:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="editor_font_button">
+                   <property name="text">
+                    <string>Choose...</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="save_button">
+         <property name="text">
+          <string>Save</string>
+         </property>
         </widget>
        </item>
       </layout>
@@ -83,8 +151,25 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>editor_font_button</sender>
+   <signal>clicked()</signal>
+   <receiver>PreferencesWidget</receiver>
+   <slot>choose_editor_font()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>478</x>
+     <y>193</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>328</x>
+     <y>199</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>save()</slot>
+  <slot>choose_editor_font()</slot>
  </slots>
 </ui>

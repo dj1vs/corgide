@@ -15,6 +15,8 @@ public:
     PreferencesWidget(Preferences *preferences, QWidget *parent = nullptr);
     ~PreferencesWidget();
 private slots:
+    void choose_editor_font();
+
     void save();
 private:
     Ui::PreferencesWidget *ui;
@@ -22,4 +24,5 @@ private:
     QShortcut *save_shortcut;
 
     Preferences *preferences;
+    Preferences buf_preferences;
 };

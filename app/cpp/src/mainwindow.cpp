@@ -44,6 +44,7 @@ MainWindow::~MainWindow() {
 
 void MainWindow::open_new_tab() {
     CodeEditor *editor = new CodeEditor(this);
+    editor->setFont(preferences.editor_font);
 
     auto *highlighter = new QSourceHighlite::QSourceHighliter(editor->document());
     highlighter->setCurrentLanguage(QSourceHighlite::QSourceHighliter::CodeCpp);
@@ -384,11 +385,22 @@ void MainWindow::write_settings() {
 
     settings.setValue("opened_tabs", opened_tabs_str);
 
-    // compiler
-
     settings.beginGroup("compiler");
-
     settings.setValue("compiler_path", preferences.compiler_path);
+    settings.endGroup();
+
+    settings.beginGroup("view");
+    
+    settings.beginGroup("editor_font");
+    settings.setValue("font_family", preferences.editor_font.family());
+    settings.setValue("font_size", preferences.editor_font.pointSize());
+    settings.setValue("bold", preferences.editor_font.bold());
+    settings.setValue("italic", preferences.editor_font.italic());
+    settings.setValue("strikeout", preferences.editor_font.strikeOut());
+    settings.setValue("underline", preferences.editor_font.underline());
+    settings.endGroup();
+
+    settings.endGroup();
 }
 void MainWindow::read_settings() {
     QSettings settings(QApplication::organizationName(), QApplication::applicationName());
@@ -432,8 +444,26 @@ void MainWindow::read_settings() {
 
     // setup compiler settings
     settings.beginGroup("compiler");
-
     preferences.compiler_path = settings.value("compiler_path", "/usr/bin/gcc").toString();
+    settings.endGroup();
+
+    settings.beginGroup("view");
+
+    settings.beginGroup("editor_font");
+    preferences.editor_font.setFamily(settings.value("font_family", this->font().family()).toString());
+    preferences.editor_font.setPointSize(settings.value("font_size", this->font().pointSize()).toInt());
+    preferences.editor_font.setBold(settings.value("bold", this->font().bold()).toBool());
+    preferences.editor_font.setItalic(settings.value("italic", this->font().italic()).toBool());
+    preferences.editor_font.setStrikeOut(settings.value("strikeout", this->font().strikeOut()).toBool());
+    preferences.editor_font.setUnderline(settings.value("underline", this->font().underline()).toBool());    
+
+    for (int tab_ind = 0; tab_ind < ui->tab_widget->count(); ++tab_ind) {
+        ui->tab_widget->widget(tab_ind)->setFont(preferences.editor_font);
+    }
+    settings.endGroup();
+
+    settings.endGroup();
+
 }
 
 CodeEditor* MainWindow::get_cur_editor() const {

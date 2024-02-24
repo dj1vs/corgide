@@ -5,5 +5,7 @@
 
 struct Preferences {
     QString compiler_path;
+
+    QFont editor_font;
 };
 

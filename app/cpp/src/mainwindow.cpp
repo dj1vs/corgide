@@ -19,6 +19,8 @@
 #include "codeeditor.hpp"
 #include "preferenceswidget.hpp"
 
+#include "font_settings.hpp"
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow) {
@@ -391,17 +393,11 @@ void MainWindow::write_settings() {
 
     settings.beginGroup("view");
     
-    settings.beginGroup("editor_font");
-    settings.setValue("font_family", preferences.editor_font.family());
-    settings.setValue("font_size", preferences.editor_font.pointSize());
-    settings.setValue("bold", preferences.editor_font.bold());
-    settings.setValue("italic", preferences.editor_font.italic());
-    settings.setValue("strikeout", preferences.editor_font.strikeOut());
-    settings.setValue("underline", preferences.editor_font.underline());
-    settings.endGroup();
+    write_font_to_settings("editor_font", preferences.editor_font, settings);
 
     settings.endGroup();
 }
+
 void MainWindow::read_settings() {
     QSettings settings(QApplication::organizationName(), QApplication::applicationName());
 
@@ -449,18 +445,11 @@ void MainWindow::read_settings() {
 
     settings.beginGroup("view");
 
-    settings.beginGroup("editor_font");
-    preferences.editor_font.setFamily(settings.value("font_family", this->font().family()).toString());
-    preferences.editor_font.setPointSize(settings.value("font_size", this->font().pointSize()).toInt());
-    preferences.editor_font.setBold(settings.value("bold", this->font().bold()).toBool());
-    preferences.editor_font.setItalic(settings.value("italic", this->font().italic()).toBool());
-    preferences.editor_font.setStrikeOut(settings.value("strikeout", this->font().strikeOut()).toBool());
-    preferences.editor_font.setUnderline(settings.value("underline", this->font().underline()).toBool());    
+    preferences.editor_font = read_font_from_settings("editor_font", settings, this->font());
 
     for (int tab_ind = 0; tab_ind < ui->tab_widget->count(); ++tab_ind) {
         ui->tab_widget->widget(tab_ind)->setFont(preferences.editor_font);
     }
-    settings.endGroup();
 
     settings.endGroup();
 

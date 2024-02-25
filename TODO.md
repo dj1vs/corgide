@@ -1,4 +1,4 @@
-- [ ] Colorize matching brackets
-- [ ] Autocomplete brackets
-- [ ] Change editor font
-- [ ] Change editor colors
+- [ ] Check if compiler flags are correct
+- [ ] Check if compiler path is correct
+- [ ] Allow user to pick where the executable is stored
+- [ ] Allow user to pick how the executable is called

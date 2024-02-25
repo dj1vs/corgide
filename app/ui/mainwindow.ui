@@ -84,7 +84,7 @@
      <x>0</x>
      <y>0</y>
      <width>856</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="file_menu">
@@ -115,6 +115,7 @@
      <string>Run</string>
     </property>
     <addaction name="compile_action"/>
+    <addaction name="exec_action"/>
    </widget>
    <addaction name="file_menu"/>
    <addaction name="tab_menu"/>
@@ -186,6 +187,11 @@
   <action name="compile_action">
    <property name="text">
     <string>Compile</string>
+   </property>
+  </action>
+  <action name="exec_action">
+   <property name="text">
+    <string>Exec</string>
    </property>
   </action>
  </widget>
@@ -343,6 +349,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>exec_action</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>execute()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>427</x>
+     <y>315</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>open_new_tab()</slot>
@@ -354,5 +376,6 @@
   <slot>ask_open_folder()</slot>
   <slot>open_preferences()</slot>
   <slot>compile()</slot>
+  <slot>execute()</slot>
  </slots>
 </ui>

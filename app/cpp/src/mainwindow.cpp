@@ -253,11 +253,23 @@ void MainWindow::compile() {
         return; 
     }
 
-    const QString compile_command = preferences.compiler_path + ' ' \
+    const QString compile_cmd = preferences.compiler_path + ' ' \
         + preferences.compiler_args + ' '\
         + file_name.value() + " -o " + QFileInfo(file_name.value()).baseName() + '\n';
 
-    ui->terminal->runCommand(compile_command);
+    ui->terminal->runCommand(compile_cmd);
+}
+
+void MainWindow::execute() {
+    const auto cur_editor = get_cur_editor();
+    std::optional<QString> file_name = cur_editor->get_file_name();
+    if (!file_name.has_value()) {
+        return;
+    }
+
+    const QString exec_cmd = "./" + QFileInfo(file_name.value()).baseName() + '\n';
+
+    ui->terminal->runCommand(exec_cmd);
 }
 
 void MainWindow::open_preferences() {

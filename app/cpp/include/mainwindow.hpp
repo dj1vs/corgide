@@ -42,6 +42,7 @@ private slots:
     void open_folder_file();
 
     void compile();
+    void execute();
 
     void open_preferences();
 

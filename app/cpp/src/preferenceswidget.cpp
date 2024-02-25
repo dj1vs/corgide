@@ -13,6 +13,7 @@ PreferencesWidget::PreferencesWidget(Preferences *preferences, QWidget *parent)
     connect(save_shortcut, &QShortcut::activated, this, &PreferencesWidget::save);
 
     ui->compiler_path_input->setText(preferences->compiler_path);
+    ui->compiler_args_input->setText(preferences->compiler_args);
 
     buf_preferences = *preferences;
 }
@@ -34,6 +35,7 @@ void PreferencesWidget::choose_editor_font() {
 
 void PreferencesWidget::save() {
     preferences->compiler_path = ui->compiler_path_input->text();
+    preferences->compiler_args = ui->compiler_args_input->text();
     
     preferences->editor_font = buf_preferences.editor_font;
 }

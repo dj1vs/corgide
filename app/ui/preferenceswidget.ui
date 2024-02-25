@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>658</width>
-    <height>400</height>
+    <height>472</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,15 +24,15 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>642</width>
-        <height>384</height>
+        <width>638</width>
+        <height>452</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
         <widget class="QTabWidget" name="tabWidget">
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="tab">
           <attribute name="title">
@@ -49,8 +49,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>606</width>
-                <height>279</height>
+                <width>596</width>
+                <height>352</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -65,6 +65,20 @@
                  </item>
                  <item>
                   <widget class="QLineEdit" name="compiler_path_input"/>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_3">
+                 <item>
+                  <widget class="QLabel" name="label_2">
+                   <property name="text">
+                    <string>Compiler arguments:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="compiler_args_input"/>
                  </item>
                 </layout>
                </item>
@@ -89,8 +103,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>606</width>
-                <height>279</height>
+                <width>596</width>
+                <height>352</height>
                </rect>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">

@@ -253,7 +253,11 @@ void MainWindow::compile() {
         return; 
     }
 
-    ui->terminal->runCommand(preferences.compiler_path + ' ' + file_name.value() + " -o " + QFileInfo(file_name.value()).baseName() + '\n');
+    const QString compile_command = preferences.compiler_path + ' ' \
+        + preferences.compiler_args + ' '\
+        + file_name.value() + " -o " + QFileInfo(file_name.value()).baseName() + '\n';
+
+    ui->terminal->runCommand(compile_command);
 }
 
 void MainWindow::open_preferences() {
@@ -389,6 +393,7 @@ void MainWindow::write_settings() {
 
     settings.beginGroup("compiler");
     settings.setValue("compiler_path", preferences.compiler_path);
+    settings.setValue("compiler_args", preferences.compiler_args);
     settings.endGroup();
 
     settings.beginGroup("view");
@@ -441,6 +446,7 @@ void MainWindow::read_settings() {
     // setup compiler settings
     settings.beginGroup("compiler");
     preferences.compiler_path = settings.value("compiler_path", "/usr/bin/gcc").toString();
+    preferences.compiler_args = settings.value("compiler_args", "-Wall -Wextra -O2").toString();
     settings.endGroup();
 
     settings.beginGroup("view");

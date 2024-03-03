@@ -44,6 +44,10 @@ private slots:
     void compile();
     void execute();
 
+    void terminal_focus();
+    void editor_focus();
+    void folder_focus();
+
     void open_preferences();
 
     void show_folder_context_menu(const QPoint &point) const;

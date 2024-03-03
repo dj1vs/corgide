@@ -2,3 +2,8 @@
 - [ ] Check if compiler path is correct
 - [ ] Allow user to pick where the executable is stored
 - [ ] Allow user to pick how the executable is called
+- [ ] Add shortcut to focus on terminal
+- [ ] Add shortcut to focus on code editor
+- [ ] Add shortcut to focus on file tree
+- [ ] Add round-brackets autocompletion
+- [ ] Add line-deletion shortcut

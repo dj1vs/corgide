@@ -12,6 +12,7 @@
 #include <QModelIndexList>
 #include <QSettings>
 #include <QInputDialog>
+#include <QShortcut>
 
 #include "qsourcehighliter.h"
 #include "fs.hpp"
@@ -28,6 +29,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     fs_model = new QFileSystemModel;
     fs_model->setRootPath(QDir::root().absolutePath());
+
+    QShortcut *terminal_focus_shortcut = new QShortcut(QKeySequence("Ctrl+~"), this);
+    QShortcut *editor_focus_shortcut = new QShortcut(QKeySequence("Ctrl+1"), this);
+    QShortcut *folder_focus_shortcut = new QShortcut(QKeySequence("Ctrl+Shift+E"), this);
+    connect(terminal_focus_shortcut, &QShortcut::activated, this, &MainWindow::terminal_focus);
+    connect(editor_focus_shortcut, &QShortcut::activated, this, &MainWindow::editor_focus);
+    connect(folder_focus_shortcut, &QShortcut::activated, this, &MainWindow::folder_focus);
 
     setup_folder_context_menu();
 
@@ -158,7 +166,6 @@ void MainWindow::ask_save_file() {
         QString file_name_filter = "";
         file_name = QFileDialog::getSaveFileName(this, "Chose file save path", "", "", &file_name_filter);
         if (!file_name.length()) {
-            QMessageBox::warning(this, "Warning", "File was not selected", QMessageBox::Ok);
             return;
         }
     }
@@ -270,6 +277,18 @@ void MainWindow::execute() {
     const QString exec_cmd = "./" + QFileInfo(file_name.value()).baseName() + '\n';
 
     ui->terminal->runCommand(exec_cmd);
+}
+
+void MainWindow::terminal_focus() {
+    ui->terminal->setFocus(Qt::FocusReason::ShortcutFocusReason);
+}
+
+void MainWindow::editor_focus() {
+    get_cur_editor()->setFocus(Qt::FocusReason::MouseFocusReason);
+}
+
+void MainWindow::folder_focus() {
+    ui->tree_view->setFocus(Qt::FocusReason::ShortcutFocusReason);
 }
 
 void MainWindow::open_preferences() {

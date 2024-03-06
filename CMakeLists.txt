@@ -21,40 +21,28 @@ file(GLOB_RECURSE app_ui  "${CMAKE_CURRENT_SOURCE_DIR}/app/cpp/*.ui")
 file(GLOB_RECURSE qsourcehighlite_inc "${CMAKE_CURRENT_SOURCE_DIR}/QSourceHighlite/*.hpp")
 file(GLOB_RECURSE qsourcehighlite_cpp "${CMAKE_CURRENT_SOURCE_DIR}/QSourceHighlite/*.cpp")
 
-file(GLOB_RECURSE qlightterminal_inc "${CMAKE_CURRENT_SOURCE_DIR}/QLightTerminal/*.hpp")
-file(GLOB_RECURSE qlightterminal_cpp "${CMAKE_CURRENT_SOURCE_DIR}/QLightTerminal/*.cpp")
+file(GLOB_RECURSE tp_inc "${CMAKE_CURRENT_SOURCE_DIR}/app/third-party/*.hpp")
+file(GLOB_RECURSE tp_src "${CMAKE_CURRENT_SOURCE_DIR}/app/third-party/*.cpp")
 
 set(PROJECT_SOURCES
         ${app_inc}
         ${app_src}
         ${app_ui}
 
-        ${qsourcehighlite_inc}
-        ${qsourcehighlite_cpp}
-        ${qlightterminal_inc}
-        ${qlightterminal_cpp}
+        ${tp_inc}
+        ${tp_src}
 )
 
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(corgide
-        MANUAL_FINALIZATION
-        ${PROJECT_SOURCES}
+
+add_executable(corgide
+    ${PROJECT_SOURCES}
     )
-# Define target properties for Android with Qt 6 as:
-#    set_property(TARGET corgide APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
-#                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
-# For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
-else()
-    add_executable(corgide
-        ${PROJECT_SOURCES}
-        )
-endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC 
     "${CMAKE_CURRENT_SOURCE_DIR}/app/cpp/include"
     "${CMAKE_CURRENT_SOURCE_DIR}/app/ui"
-    "${CMAKE_CURRENT_SOURCE_DIR}/QSourceHighlite"
-    "${CMAKE_CURRENT_SOURCE_DIR}/QLightTerminal"
+    "${CMAKE_CURRENT_SOURCE_DIR}/app/third-party/QSourceHighlite"
+    "${CMAKE_CURRENT_SOURCE_DIR}/app/third-party/QLightTerminal"
 )
 
 target_link_libraries(corgide PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)

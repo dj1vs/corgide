@@ -199,7 +199,7 @@
   <customwidget>
    <class>QLightTerminal</class>
    <extends>QWidget</extends>
-   <header location="global">../../QLightTerminal/qlightterminal.h</header>
+   <header location="global">../third-party/QLightTerminal/qlightterminal.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

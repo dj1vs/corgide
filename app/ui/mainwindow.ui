@@ -188,10 +188,16 @@
    <property name="text">
     <string>Compile</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+F9</string>
+   </property>
   </action>
   <action name="exec_action">
    <property name="text">
     <string>Exec</string>
+   </property>
+   <property name="shortcut">
+    <string>Shift+F10</string>
    </property>
   </action>
  </widget>

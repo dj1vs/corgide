@@ -24,6 +24,9 @@
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
+      <property name="childrenCollapsible">
+       <bool>true</bool>
+      </property>
       <widget class="QGroupBox" name="groupBox">
        <property name="minimumSize">
         <size>
@@ -189,7 +192,7 @@
     <string>Compile</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+Shift+F9</string>
+    <string>Ctrl+F9</string>
    </property>
   </action>
   <action name="exec_action">

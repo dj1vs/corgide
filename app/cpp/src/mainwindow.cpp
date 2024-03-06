@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent)
     fs_model = new QFileSystemModel;
     fs_model->setRootPath(QDir::root().absolutePath());
 
-    QShortcut *terminal_focus_shortcut = new QShortcut(QKeySequence("Ctrl+~"), this);
+    QShortcut *terminal_focus_shortcut = new QShortcut(QKeySequence("Ctrl+`"), this);
     QShortcut *editor_focus_shortcut = new QShortcut(QKeySequence("Ctrl+1"), this);
     QShortcut *folder_focus_shortcut = new QShortcut(QKeySequence("Ctrl+Shift+E"), this);
     connect(terminal_focus_shortcut, &QShortcut::activated, this, &MainWindow::terminal_focus);
@@ -280,7 +280,27 @@ void MainWindow::execute() {
 }
 
 void MainWindow::terminal_focus() {
-    ui->terminal->setFocus(Qt::FocusReason::ShortcutFocusReason);
+    const bool has_focus = ui->terminal->hasFocus();
+    const auto ind_in_splitter = ui->terminal_splitter->indexOf(ui->terminal);
+    auto sizes = ui->terminal_splitter->sizes();
+
+    if (has_focus) {
+        prev_terminal_height = ui->terminal->height();
+
+        sizes[ind_in_splitter] = 0;
+
+        ui->terminal->clearFocus();
+
+    } else {
+        if (!sizes[ind_in_splitter] && ind_in_splitter && prev_terminal_height <= sizes[ind_in_splitter - 1]) {
+            sizes[ind_in_splitter-1] -= prev_terminal_height; // possible undefined behaviour (ind_in_splitter < 0 or prev_terminal_height > sizes[in...])
+            sizes[ind_in_splitter] = prev_terminal_height;\
+        }
+        ui->terminal->show();
+        ui->terminal->setFocus(Qt::FocusReason::ShortcutFocusReason);
+    }
+    
+    ui->terminal_splitter->setSizes(sizes);
 }
 
 void MainWindow::editor_focus() {

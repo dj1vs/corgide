@@ -80,5 +80,7 @@ private:
 
     Preferences preferences;
 
+    int prev_terminal_height = 0;
+
     bool is_folder_opened = false;
 };

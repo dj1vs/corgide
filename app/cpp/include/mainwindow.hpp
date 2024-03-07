@@ -23,33 +23,37 @@ public:
     ~MainWindow();
 
 private slots:
+    // tab
     void open_new_tab();
     void close_tab(int index);
     void close_current_tab();
     void next_tab();
     void prev_tab();
 
+    // file
     void ask_open_file();
     void ask_save_file();
-
     void ask_rename_file();
-
     void ask_create_file();
     void ask_delete_file();
 
+    // folder
     void ask_open_folder();
-
     void open_folder_file();
 
+    // run
     void compile();
     void execute();
 
+    // focus
     void terminal_focus();
     void editor_focus();
     void folder_focus();
 
+    // open
     void open_preferences();
 
+    // custom menu override
     void show_folder_context_menu(const QPoint &point) const;
 private:
     void open_file(const QString &file_name);
@@ -66,7 +70,6 @@ private:
     CodeEditor *get_tab_editor(uint8_t tab_ind) const;
 
     void setup_folder_context_menu();
-
 private:
     Ui::MainWindow *ui;
 
@@ -80,7 +83,7 @@ private:
 
     Preferences preferences;
 
-    int prev_terminal_height = 0;
+    int prev_terminal_height = 0; // need this to re-open terminal on shortcut with the same height
 
     bool is_folder_opened = false;
 };

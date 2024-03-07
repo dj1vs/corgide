@@ -23,19 +23,12 @@
 #include "font_settings.hpp"
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow) {
+    : QMainWindow(parent), ui(new Ui::MainWindow)
+{
     ui->setupUi(this);
 
     fs_model = new QFileSystemModel;
     fs_model->setRootPath(QDir::root().absolutePath());
-
-    QShortcut *terminal_focus_shortcut = new QShortcut(QKeySequence("Ctrl+`"), this);
-    QShortcut *editor_focus_shortcut = new QShortcut(QKeySequence("Ctrl+1"), this);
-    QShortcut *folder_focus_shortcut = new QShortcut(QKeySequence("Ctrl+Shift+E"), this);
-    connect(terminal_focus_shortcut, &QShortcut::activated, this, &MainWindow::terminal_focus);
-    connect(editor_focus_shortcut, &QShortcut::activated, this, &MainWindow::editor_focus);
-    connect(folder_focus_shortcut, &QShortcut::activated, this, &MainWindow::folder_focus);
 
     setup_folder_context_menu();
 

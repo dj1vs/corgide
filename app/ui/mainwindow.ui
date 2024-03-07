@@ -120,10 +120,19 @@
     <addaction name="compile_action"/>
     <addaction name="exec_action"/>
    </widget>
+   <widget class="QMenu" name="focus_menu">
+    <property name="title">
+     <string>Focus</string>
+    </property>
+    <addaction name="terminal_focus_action"/>
+    <addaction name="editor_focus_action"/>
+    <addaction name="folder_focus_action"/>
+   </widget>
    <addaction name="file_menu"/>
    <addaction name="tab_menu"/>
    <addaction name="folder_menu"/>
    <addaction name="run_menu"/>
+   <addaction name="focus_menu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="open_file_action">
@@ -201,6 +210,39 @@
    </property>
    <property name="shortcut">
     <string>Shift+F10</string>
+   </property>
+  </action>
+  <action name="terminal_focus_action">
+   <property name="text">
+    <string>Terminal Focus</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+`</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="editor_focus_action">
+   <property name="text">
+    <string>Editor Focus</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+1</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="folder_focus_action">
+   <property name="text">
+    <string>Folder Focus</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+E</string>
+   </property>
+   <property name="iconVisibleInMenu">
+    <bool>true</bool>
    </property>
   </action>
  </widget>
@@ -374,6 +416,54 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>terminal_focus_action</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>terminal_focus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>341</x>
+     <y>326</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>editor_focus_action</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>editor_focus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>341</x>
+     <y>326</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>folder_focus_action</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>folder_focus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>341</x>
+     <y>326</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>open_new_tab()</slot>
@@ -387,5 +477,7 @@
   <slot>compile()</slot>
   <slot>execute()</slot>
   <slot>terminal_focus()</slot>
+  <slot>editor_focus()</slot>
+  <slot>folder_focus()</slot>
  </slots>
 </ui>

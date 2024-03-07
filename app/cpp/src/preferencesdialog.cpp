@@ -5,7 +5,7 @@
 #include <QFontDialog>
 #include <QMessageBox>
 
-#include "ds.hpp"
+#include "ds/preferences.hpp"
 
 PreferencesDialog::PreferencesDialog(Preferences *preferences, QDialog *parent)
     :QDialog(parent), ui(new Ui::PreferencesDialog), preferences(preferences)

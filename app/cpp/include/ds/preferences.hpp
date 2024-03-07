@@ -1,21 +1,12 @@
 #pragma once
 
+#include "shortcuttype.hpp"
+
 #include <unordered_map>
 #include <QString>
 #include <QShortcut>
-
-enum class ShortcutType {
-    FILE_OPEN,
-    FILE_SAVE,
-    TAB_NEW,
-    TAB_CLOSE,
-    TAB_NEXT,
-    TAB_PREV,
-    FOLER_OPEN,
-    RUN_COMPILE,
-    RUN_EXEC
-};
-
+#include <QFont>
+#include <QKeySequence>
 
 struct Preferences {
     QString compiler_path;

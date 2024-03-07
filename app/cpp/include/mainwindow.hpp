@@ -2,7 +2,7 @@
 
 #include <QMainWindow>
 
-#include "ds.hpp"
+#include "ds/preferences.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

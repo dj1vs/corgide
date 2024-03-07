@@ -1,25 +1,25 @@
 #pragma once
 
-#include <QWidget>
+#include <QDialog>
 
 #include "ds.hpp"
 
 QT_BEGIN_NAMESPACE
-namespace Ui {class PreferencesWidget;};
+namespace Ui {class PreferencesDialog;};
 class QShortcut;
 QT_END_NAMESPACE
 
-class PreferencesWidget : public QWidget {
+class PreferencesDialog : public QDialog {
     Q_OBJECT;
 public:
-    PreferencesWidget(Preferences *preferences, QWidget *parent = nullptr);
-    ~PreferencesWidget();
+    PreferencesDialog(Preferences *preferences, QDialog *parent = nullptr);
+    ~PreferencesDialog();
 private slots:
     void choose_editor_font();
 
     void save();
 private:
-    Ui::PreferencesWidget *ui;
+    Ui::PreferencesDialog *ui;
 
     QShortcut *save_shortcut;
 

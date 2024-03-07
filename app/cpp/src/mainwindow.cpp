@@ -18,7 +18,7 @@
 #include "fs.hpp"
 
 #include "codeeditor.hpp"
-#include "preferenceswidget.hpp"
+#include "preferencesdialog.hpp"
 
 #include "font_settings.hpp"
 
@@ -312,10 +312,10 @@ void MainWindow::folder_focus() {
 }
 
 void MainWindow::open_preferences() {
-    PreferencesWidget *preferences_widget = new PreferencesWidget(&preferences);
-    preferences_widget->setAttribute(Qt::WA_DeleteOnClose);
+    PreferencesDialog *preferences_dialog = new PreferencesDialog(&preferences);
+    preferences_dialog->setAttribute(Qt::WA_DeleteOnClose);
 
-    preferences_widget->show();
+    preferences_dialog->show();
 }
 
 void MainWindow::ask_open_folder() {
@@ -452,6 +452,44 @@ void MainWindow::write_settings() {
     write_font_to_settings("editor_font", preferences.editor_font, settings);
 
     settings.endGroup();
+
+    
+    // setup shortcuts
+    settings.beginGroup("shortcuts");
+
+    // file shortcuts
+    settings.beginGroup("file");
+
+    settings.setValue("open", preferences.shortcuts[ShortcutType::FILE_OPEN].toString());
+    settings.setValue("save", preferences.shortcuts[ShortcutType::FILE_SAVE].toString());    
+
+    settings.endGroup();
+    // folder shortcuts
+    settings.beginGroup("folder");
+
+    settings.setValue("open", preferences.shortcuts[ShortcutType::FOLER_OPEN].toString());
+
+    settings.endGroup();
+
+    // run shortcuts
+    settings.beginGroup("run");
+
+    settings.setValue("compile", preferences.shortcuts[ShortcutType::RUN_COMPILE].toString());
+    settings.setValue("exec", preferences.shortcuts[ShortcutType::RUN_EXEC].toString());
+
+    settings.endGroup();
+
+    // tab shortcuts
+    settings.beginGroup("tab");
+
+    settings.setValue("close", preferences.shortcuts[ShortcutType::TAB_CLOSE].toString());
+    settings.setValue("new",   preferences.shortcuts[ShortcutType::TAB_NEW].toString());
+    settings.setValue("next",  preferences.shortcuts[ShortcutType::TAB_NEXT].toString());
+    settings.setValue("prev",  preferences.shortcuts[ShortcutType::TAB_PREV].toString());
+
+    settings.endGroup();
+
+    settings.endGroup(); // shortcuts
 }
 
 void MainWindow::read_settings() {
@@ -510,6 +548,55 @@ void MainWindow::read_settings() {
 
     settings.endGroup();
 
+    // setup shortcuts
+    settings.beginGroup("shortcuts");
+
+    // file shortcuts
+    settings.beginGroup("file");
+    
+    preferences.shortcuts[ShortcutType::FILE_OPEN] = settings.value("open", "Ctrl+O").toString();
+    preferences.shortcuts[ShortcutType::FILE_SAVE] = settings.value("save", "Ctrl+S").toString();
+
+    settings.endGroup();
+    // folder shortcuts
+    settings.beginGroup("folder");
+
+    preferences.shortcuts[ShortcutType::FOLER_OPEN] = settings.value("open", "Ctrl+K, Ctrl+O").toString();
+
+    settings.endGroup();
+
+    // run shortcuts
+    settings.beginGroup("run");
+
+    preferences.shortcuts[ShortcutType::RUN_COMPILE] = settings.value("compile", "Ctrl+F9").toString();
+    preferences.shortcuts[ShortcutType::RUN_EXEC] = settings.value("exec", "Shift+F10").toString();
+
+    settings.endGroup();
+
+    // tab shortcuts
+    settings.beginGroup("tab");
+
+    preferences.shortcuts[ShortcutType::TAB_CLOSE] = settings.value("close", "Ctrl+W").toString();
+    preferences.shortcuts[ShortcutType::TAB_NEW]   = settings.value("new",   "Ctrl+N").toString();
+    preferences.shortcuts[ShortcutType::TAB_NEXT]  = settings.value("next",  "Ctrl+PgDown").toString();
+    preferences.shortcuts[ShortcutType::TAB_PREV]  = settings.value("prev",  "Ctrl+PgUp").toString();
+
+    settings.endGroup();
+
+    settings.endGroup(); // shortcuts
+
+    ui->open_file_action->setShortcut(preferences.shortcuts[ShortcutType::FILE_OPEN]);
+    ui->save_file_action->setShortcut(preferences.shortcuts[ShortcutType::FILE_SAVE]);
+
+    ui->open_folder_action->setShortcut(preferences.shortcuts[ShortcutType::FOLER_OPEN]);
+
+    ui->compile_action->setShortcut(preferences.shortcuts[ShortcutType::RUN_COMPILE]);
+    ui->exec_action->setShortcut(preferences.shortcuts[ShortcutType::RUN_EXEC]);
+
+    ui->close_tab_action->setShortcut(preferences.shortcuts[ShortcutType::TAB_CLOSE]);
+    ui->new_tab_action->setShortcut(preferences.shortcuts[ShortcutType::TAB_NEW]);
+    ui->next_tab_action->setShortcut(preferences.shortcuts[ShortcutType::TAB_NEXT]);
+    ui->prev_tab_action->setShortcut(preferences.shortcuts[ShortcutType::TAB_PREV]);
 }
 
 CodeEditor* MainWindow::get_cur_editor() const {

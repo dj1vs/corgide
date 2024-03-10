@@ -22,6 +22,8 @@
 
 #include "font_settings.hpp"
 
+#include "codeforceswrapper.hpp"
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -37,6 +39,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->tab_widget, &QTabWidget::tabCloseRequested, this, &MainWindow::close_tab);
 
     read_settings();
+
+    scraper = new CodeforcesWrapper();
 }
 
 MainWindow::~MainWindow() {
@@ -141,7 +145,7 @@ void MainWindow::prev_tab() {
 
 void MainWindow::ask_open_file() {
     QString file_name_filter = "";
-    const QString file_name = QFileDialog::getOpenFileName(this, "Choose file to open", "", "", &file_name_filter);
+    const QString file_name = QFileDialog::getOpenFileName(this, "Choose file to open", get_opened_folder(), "", &file_name_filter);
     if (!file_name.length()) {
         return;
     } 
@@ -157,7 +161,7 @@ void MainWindow::ask_save_file() {
         file_name = cur_editor->get_file_name().value();
     } else {
         QString file_name_filter = "";
-        file_name = QFileDialog::getSaveFileName(this, "Chose file save path", "", "", &file_name_filter);
+        file_name = QFileDialog::getSaveFileName(this, "Chose file save path", get_opened_folder(), "", &file_name_filter);
         if (!file_name.length()) {
             return;
         }
@@ -246,10 +250,12 @@ void MainWindow::open_folder_file() {
 }
 
 void MainWindow::compile() {
+    qDebug() << "compile";
     const auto cur_editor = get_cur_editor();
 
     std::optional<QString> file_name = cur_editor->get_file_name();
     if (!file_name.has_value()) {
+        qDebug() << "No file name!";
         return; 
     }
 

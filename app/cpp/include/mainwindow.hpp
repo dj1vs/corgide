@@ -14,6 +14,8 @@ class CodeEditor;
 class QVariant;
 QT_END_NAMESPACE
 
+class CodeforcesWrapper;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -80,6 +82,8 @@ private:
     QAction *folder_create_file_action;
     QAction *folder_delete_file_action;
     QAction *folder_rename_file_action;
+
+    CodeforcesWrapper *scraper;
 
     Preferences preferences;
 

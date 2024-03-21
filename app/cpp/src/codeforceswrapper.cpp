@@ -51,49 +51,6 @@ void printNode(xmlNodePtr node, int depth) {
 }
 
 xmlNodePtr find_tag(xmlNodePtr node, const QString &tag, const QString &tag_class = "") {
-    if (node == nullptr) {
-        return nullptr;
-    }
-
-    xmlNodePtr tag_ptr = nullptr;
-
-    if (node->type == XML_ELEMENT_NODE && xmlStrcmp(node->name, (const xmlChar*)(tag.toStdString().c_str())) == 0) {
-        if (tag_class == "") {
-            return tag_ptr;
-        } else {
-            xmlChar* class_attr = xmlGetProp(node, (const xmlChar*)"class");
-
-            if (class_attr != nullptr) {
-                const QString class_attr_str = xmlCharToQString(class_attr);
-                if (class_attr_str == tag_class) {
-                    return tag_ptr;
-                }
-            }
-
-            xmlFree(class_attr);
-        }
-        
-    }
- 
-    for (xmlNodePtr child = node->children; child != nullptr; child = child->next) {
-        tag_ptr = find_tag(child, tag, tag_class);
-        if (tag_ptr != nullptr) {
-            break;
-        }
-    }
-
-    return tag_ptr;
-}
-
-QString get_tag_contents(xmlNodePtr node) {
-    QString contents;
-    xmlChar* content = xmlNodeListGetString(node->doc, node->children, 5);
-    contents =xmlCharToQString(content);
-    xmlFree(content);
-    return contents;
-}
-
-QStringList find_tags_contents(xmlNodePtr node, const QString &tag, const QString &tag_class = "") {
     QStringList contents;
     if (node == nullptr) {
         return {};
@@ -101,18 +58,14 @@ QStringList find_tags_contents(xmlNodePtr node, const QString &tag, const QStrin
 
     if (node->type == XML_ELEMENT_NODE && xmlStrcmp(node->name, (const xmlChar*)(tag.toStdString().c_str())) == 0) {
         if (tag_class == "") {
-            xmlChar* content = xmlNodeListGetString(node->doc, node->children, 1);
-            contents << xmlCharToQString(content);
-            xmlFree(content);
+            return node;
         } else {
             xmlChar* class_attr = xmlGetProp(node, (const xmlChar*)"class");
 
             if (class_attr != nullptr) {
                 const QString class_attr_str = xmlCharToQString(class_attr);
                 if (class_attr_str == tag_class) {
-                    xmlChar* content = xmlNodeListGetString(node->doc, node->children, 5);
-                    contents << xmlCharToQString(content);
-                    xmlFree(content);
+                    return node;
                 }
             }
 
@@ -122,8 +75,44 @@ QStringList find_tags_contents(xmlNodePtr node, const QString &tag, const QStrin
     }
  
     for (xmlNodePtr child = node->children; child != nullptr; child = child->next) {
-        contents.append(find_tags_contents(child, tag, tag_class));
+        auto tag_ptr = find_tag(child, tag, tag_class);
+        if (tag_ptr != nullptr) {
+            return tag_ptr;
+        }
     }
+
+    return nullptr;
+}
+
+QString get_tag_contents(xmlNodePtr node, bool filter = true) {
+    if (node == nullptr) {
+        return "";
+    }
+    QString contents;
+
+    xmlChar* content;
+    if (filter) {
+        content = xmlNodeListGetString(node->doc, node->children, 0);
+    } else {
+        content = xmlNodeGetContent(node);
+    }
+    contents =xmlCharToQString(content);
+    xmlFree(content);
+    return contents;
+}
+
+QString get_tag_contents_r(xmlNodePtr node, bool filter = true) {
+    QString contents;
+    if (filter) {
+        contents = get_tag_contents(node);
+
+        for (xmlNodePtr child = node->children; child != nullptr; child = child->next) {
+            contents += get_tag_contents_r(child);
+        }
+    } else {
+        contents = get_tag_contents(node, filter);
+    }
+    
 
     return contents;
 }
@@ -147,13 +136,16 @@ CodeforcesWrapper::CodeforcesWrapper() {
                 return;
             }
 
-            const QString title = find_tags_contents(xmlDocGetRootElement(doc), "div", "time-limit")[0];
-            const QString time_limit = find_tags_contents(xmlDocGetRootElement(doc), "div", "time-limit")[0];
-            const QString memory_limit = find_tags_contents(xmlDocGetRootElement(doc), "div", "memory-limit")[0];
+            const QString title = get_tag_contents(find_tag(xmlDocGetRootElement(doc), "div", "title"));
+            const QString time_limit = get_tag_contents(find_tag(xmlDocGetRootElement(doc), "div", "time-limit"));
+            const QString memory_limit = get_tag_contents(find_tag(xmlDocGetRootElement(doc), "div", "memory-limit"));
+            const QString statement = get_tag_contents_r(find_tag(xmlDocGetRootElement(doc), "div", "header")->next, false);
 
             emit problem_parsed({
                 title, time_limit, memory_limit
             });
+
+            qDebug() << title << time_limit << memory_limit << statement;
 
             xmlFreeDoc(doc);
 

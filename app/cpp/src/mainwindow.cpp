@@ -54,7 +54,7 @@ void MainWindow::open_new_tab() {
     editor->setFont(preferences.editor_font);
 
     auto *highlighter = new QSourceHighlite::QSourceHighliter(editor->document());
-    highlighter->setCurrentLanguage(QSourceHighlite::QSourceHighliter::CodeCpp);
+    highlighter->setCurrentLanguage(QSourceHighlite::QSourceHighliter::CodeCpp); //TODO: determine language by extension
 
     QRegularExpression untitled_regexp("Untitled (^\\d+$)");
     QVector<int> untitled_numbers;

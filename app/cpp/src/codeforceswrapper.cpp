@@ -132,9 +132,6 @@ CodeforcesWrapper::CodeforcesWrapper() {
             emit problem_parsed(parse_problem(answer));
         }
     );
-
-
-    QUrl url("https://codeforces.com/problemset/problem/158/A");
 }
 
     
@@ -165,6 +162,11 @@ CodeforcesProblem CodeforcesWrapper::parse_problem(const QString &html)
     problem.time_limit = get_tag_contents(find_tag(xmlDocGetRootElement(doc), "div", "time-limit"));
     problem.memory_limit = get_tag_contents(find_tag(xmlDocGetRootElement(doc), "div", "memory-limit"));
     problem.statement = get_tag_contents_r(find_tag(xmlDocGetRootElement(doc), "div", "header")->next, false);
+    problem.input = get_tag_contents_r(find_tag(xmlDocGetRootElement(doc), "div", "input-specification"), false);
+    problem.output = get_tag_contents_r(find_tag(xmlDocGetRootElement(doc), "div", "output-specification"), false);
+    problem.examples = get_tag_contents_r(find_tag(xmlDocGetRootElement(doc), "div", "sample-test"), false);
+    problem.note = get_tag_contents_r(find_tag(xmlDocGetRootElement(doc), "div", "note"), false);
+    
 
     xmlFreeDoc(doc);
 

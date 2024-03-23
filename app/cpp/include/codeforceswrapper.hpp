@@ -10,6 +10,10 @@ struct CodeforcesProblem {
     QString time_limit;
     QString memory_limit;
     QString statement;
+    QString input;
+    QString output;
+    QString examples;
+    QString note;
 };
 
 class CodeforcesWrapper : public QObject{

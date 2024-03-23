@@ -329,9 +329,13 @@ void MainWindow::load_problem()
 void MainWindow::display_problem(CodeforcesProblem problem) {
     QString problem_comment = "/*\n";
     problem_comment += " * Title: " + problem.title +\
-                     "\n * Time limit: " + problem.time_limit +\
-                     "\n * Memory limit: " + problem.memory_limit +\
-                     "\n * Statement: " + problem.statement +\
+                     "\n\n * Time limit: " + problem.time_limit +\
+                     "\n\n * Memory limit: " + problem.memory_limit +\
+                     "\n\n * Statement: " + problem.statement +\
+                     "\n\n * Input: " + problem.input +\
+                     "\n\n * Output: " + problem.output +\
+                     "\n\n * Examples: " + problem.examples +\
+                     "\n\n * Note: " + problem.note +\
                     "\n*/\n";
     
     auto cur_editor = get_cur_editor();

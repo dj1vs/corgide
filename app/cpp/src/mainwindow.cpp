@@ -19,10 +19,12 @@
 
 #include "codeeditor.hpp"
 #include "preferencesdialog.hpp"
+#include "probleminputdialog.hpp"
 
 #include "font_settings.hpp"
 
 #include "codeforceswrapper.hpp"
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -315,14 +317,14 @@ void MainWindow::folder_focus() {
 void MainWindow::load_problem()
 {
     bool ok;
-    const QString problem_url = QInputDialog::getText(this->parentWidget(), "Load problem", "Type problem URL", QLineEdit::Normal, QString(), &ok);
+    ProblemInputDialog dialog;
+    dialog.exec();
 
-    if (!ok)
+    if (dialog.result() != QDialog::Rejected) 
     {
-        return;
+        emit get_problem(dialog.get_url());
     }
 
-    emit get_problem(problem_url);
     //TODO: check for correct url
 }
 

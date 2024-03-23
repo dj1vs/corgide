@@ -15,6 +15,7 @@ class QVariant;
 QT_END_NAMESPACE
 
 class CodeforcesWrapper;
+struct CodeforcesProblem;
 
 class MainWindow : public QMainWindow
 {
@@ -23,7 +24,8 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
+signals:
+    void get_problem(QString url);
 private slots:
     // tab
     void open_new_tab();
@@ -51,6 +53,10 @@ private slots:
     void terminal_focus();
     void editor_focus();
     void folder_focus();
+
+    //problem
+    void load_problem();
+    void display_problem(CodeforcesProblem);
 
     // open
     void open_preferences();
@@ -83,7 +89,7 @@ private:
     QAction *folder_delete_file_action;
     QAction *folder_rename_file_action;
 
-    CodeforcesWrapper *scraper;
+    CodeforcesWrapper *wrapper;
 
     Preferences preferences;
 

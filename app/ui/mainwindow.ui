@@ -128,11 +128,18 @@
     <addaction name="editor_focus_action"/>
     <addaction name="folder_focus_action"/>
    </widget>
+   <widget class="QMenu" name="menuProblem">
+    <property name="title">
+     <string>Problem</string>
+    </property>
+    <addaction name="problem_load_action"/>
+   </widget>
    <addaction name="file_menu"/>
    <addaction name="tab_menu"/>
    <addaction name="folder_menu"/>
    <addaction name="run_menu"/>
    <addaction name="focus_menu"/>
+   <addaction name="menuProblem"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="open_file_action">
@@ -243,6 +250,11 @@
    </property>
    <property name="iconVisibleInMenu">
     <bool>true</bool>
+   </property>
+  </action>
+  <action name="problem_load_action">
+   <property name="text">
+    <string>Load</string>
    </property>
   </action>
  </widget>
@@ -464,6 +476,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>problem_load_action</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>load_problem()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>341</x>
+     <y>326</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>open_new_tab()</slot>
@@ -479,5 +507,6 @@
   <slot>terminal_focus()</slot>
   <slot>editor_focus()</slot>
   <slot>folder_focus()</slot>
+  <slot>load_problem()</slot>
  </slots>
 </ui>

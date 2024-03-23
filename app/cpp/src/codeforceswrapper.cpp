@@ -129,41 +129,44 @@ CodeforcesWrapper::CodeforcesWrapper() {
 
             QString answer = reply->readAll();
 
-            htmlDocPtr doc = htmlReadDoc((const xmlChar*)(answer.toStdString().c_str()), NULL, NULL, HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
-
-            if (doc == NULL) {
-                qDebug() << "Failed to parse HTML";
-                return;
-            }
-
-            const QString title = get_tag_contents(find_tag(xmlDocGetRootElement(doc), "div", "title"));
-            const QString time_limit = get_tag_contents(find_tag(xmlDocGetRootElement(doc), "div", "time-limit"));
-            const QString memory_limit = get_tag_contents(find_tag(xmlDocGetRootElement(doc), "div", "memory-limit"));
-            const QString statement = get_tag_contents_r(find_tag(xmlDocGetRootElement(doc), "div", "header")->next, false);
-
-            emit problem_parsed({
-                title, time_limit, memory_limit
-            });
-
-            qDebug() << title << time_limit << memory_limit << statement;
-
-            xmlFreeDoc(doc);
-
+            emit problem_parsed(parse_problem(answer));
         }
     );
 
 
     QUrl url("https://codeforces.com/problemset/problem/158/A");
-
-    QNetworkRequest request(url);
-
-    network_access_manager->get(request); 
-
-   
-
 }
+
+    
 
 CodeforcesWrapper::~CodeforcesWrapper() {
 
     delete network_access_manager;
+}
+
+void CodeforcesWrapper::get_problem(QString url) {
+    QNetworkRequest request(url);
+
+    network_access_manager->get(request); 
+}
+
+CodeforcesProblem CodeforcesWrapper::parse_problem(const QString &html)
+{
+    htmlDocPtr doc = htmlReadDoc((const xmlChar*)(html.toStdString().c_str()), NULL, NULL, HTML_PARSE_RECOVER | HTML_PARSE_NOERROR | HTML_PARSE_NOWARNING);
+
+    if (doc == NULL) {
+        qDebug() << "Failed to parse HTML";
+        return {};
+    }
+
+    CodeforcesProblem problem;
+    
+    problem.title = get_tag_contents(find_tag(xmlDocGetRootElement(doc), "div", "title"));
+    problem.time_limit = get_tag_contents(find_tag(xmlDocGetRootElement(doc), "div", "time-limit"));
+    problem.memory_limit = get_tag_contents(find_tag(xmlDocGetRootElement(doc), "div", "memory-limit"));
+    problem.statement = get_tag_contents_r(find_tag(xmlDocGetRootElement(doc), "div", "header")->next, false);
+
+    xmlFreeDoc(doc);
+
+    return problem;
 }

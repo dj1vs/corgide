@@ -40,7 +40,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     read_settings();
 
-    scraper = new CodeforcesWrapper();
+    wrapper = new CodeforcesWrapper();
+    connect(wrapper, &CodeforcesWrapper::problem_parsed, this, &MainWindow::display_problem);
+    connect(this, &MainWindow::get_problem, wrapper, &CodeforcesWrapper::get_problem);
 }
 
 MainWindow::~MainWindow() {
@@ -308,6 +310,32 @@ void MainWindow::editor_focus() {
 
 void MainWindow::folder_focus() {
     ui->tree_view->setFocus(Qt::FocusReason::ShortcutFocusReason);
+}
+
+void MainWindow::load_problem()
+{
+    bool ok;
+    const QString problem_url = QInputDialog::getText(this->parentWidget(), "Load problem", "Type problem URL", QLineEdit::Normal, QString(), &ok);
+
+    if (!ok)
+    {
+        return;
+    }
+
+    emit get_problem(problem_url);
+    //TODO: check for correct url
+}
+
+void MainWindow::display_problem(CodeforcesProblem problem) {
+    QString problem_comment = "/*\n";
+    problem_comment += " * Title: " + problem.title +\
+                     "\n * Time limit: " + problem.time_limit +\
+                     "\n * Memory limit: " + problem.memory_limit +\
+                     "\n * Statement: " + problem.statement +\
+                    "\n*/\n";
+    
+    auto cur_editor = get_cur_editor();
+    cur_editor->setPlainText(problem_comment + cur_editor->toPlainText());
 }
 
 void MainWindow::open_preferences() {

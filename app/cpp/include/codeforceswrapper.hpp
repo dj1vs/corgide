@@ -5,19 +5,25 @@ class MyParser;
 
 #include <QObject>
 
-typedef struct {
+struct CodeforcesProblem {
     QString title;
     QString time_limit;
     QString memory_limit;
-} CodeforcesProblem;
+    QString statement;
+};
 
 class CodeforcesWrapper : public QObject{
     Q_OBJECT;
 public:
     CodeforcesWrapper();
     ~CodeforcesWrapper();
+
+public slots:
+    void get_problem(QString url);
 signals:
     void problem_parsed(CodeforcesProblem);
+private:
+    CodeforcesProblem parse_problem(const QString &html);
 private:
     QNetworkAccessManager *network_access_manager;
 

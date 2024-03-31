@@ -165,6 +165,7 @@ void MainWindow::ask_save_file() {
     QString file_name;
 
     auto cur_editor = get_cur_editor();
+    
     if (cur_editor->get_file_name().has_value()) {
         file_name = cur_editor->get_file_name().value();
     } else {
@@ -458,6 +459,8 @@ void MainWindow::save_file(const QString &file_name) {
 
     const int cur_tab_ind = ui->tab_widget->currentIndex();
     ui->tab_widget->setTabText(cur_tab_ind, QFileInfo(file.fileName()).fileName());
+
+    get_cur_editor()->set_file_name(file_name);
 
     get_cur_editor()->document()->setModified(false);
     set_current_tab_saved(true);

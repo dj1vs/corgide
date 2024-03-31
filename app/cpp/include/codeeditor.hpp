@@ -49,7 +49,6 @@ private slots:
 private:
     void add_leading_offset();
 
-    
 private:
     QWidget *lineNumberArea;
 

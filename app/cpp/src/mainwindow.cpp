@@ -57,6 +57,10 @@ void MainWindow::open_new_tab() {
     CodeEditor *editor = new CodeEditor(this);
     editor->setFont(preferences.editor_font);
 
+    connect(editor, &CodeEditor::textChanged, this, [&] () {
+        this->set_current_tab_saved(false);
+    });
+
     auto *highlighter = new QSourceHighlite::QSourceHighliter(editor->document());
     highlighter->setCurrentLanguage(QSourceHighlite::QSourceHighliter::CodeCpp); //TODO: determine language by extension
 
@@ -344,6 +348,11 @@ void MainWindow::display_problem(CodeforcesProblem problem) {
     cur_editor->setPlainText(problem_comment + cur_editor->toPlainText());
 }
 
+void MainWindow::start_comp()
+{
+    
+}
+
 void MainWindow::open_preferences() {
     PreferencesDialog *preferences_dialog = new PreferencesDialog(&preferences);
     preferences_dialog->setAttribute(Qt::WA_DeleteOnClose);
@@ -365,6 +374,39 @@ void MainWindow::ask_open_folder() {
 void MainWindow::show_folder_context_menu(const QPoint &point) const {
     folder_context_menu->exec(ui->tree_view->viewport()->mapToGlobal(point));
 
+}
+
+void MainWindow::set_current_tab_saved(bool status)
+{
+    const int cur_tab_ind = ui->tab_widget->currentIndex();
+    QString cur_tab_text = ui->tab_widget->tabText(cur_tab_ind);
+
+    QStringList cur_tab_text_split = cur_tab_text.split(" ");
+
+    if (cur_tab_text_split.last() == "*")
+    {
+        if (status)
+        {
+            cur_tab_text_split.pop_back();
+            ui->tab_widget->setTabText(cur_tab_ind, cur_tab_text_split.join(" "));
+        }
+        else
+        {
+            return;
+        }
+    }
+    else
+    {
+        if (!status)
+        {
+            cur_tab_text_split.push_back("*");
+            ui->tab_widget->setTabText(cur_tab_ind, cur_tab_text_split.join(" "));
+        }
+        else
+        {
+            return;
+        }
+    }
 }
 
 void MainWindow::open_file(const QString &file_name) {
@@ -418,6 +460,7 @@ void MainWindow::save_file(const QString &file_name) {
     ui->tab_widget->setTabText(cur_tab_ind, QFileInfo(file.fileName()).fileName());
 
     get_cur_editor()->document()->setModified(false);
+    set_current_tab_saved(true);
 }
 
 void MainWindow::open_folder(const QString &folder_name) {

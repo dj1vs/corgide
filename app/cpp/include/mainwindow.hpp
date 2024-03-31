@@ -33,6 +33,7 @@ private slots:
     void close_current_tab();
     void next_tab();
     void prev_tab();
+    void set_current_tab_saved(bool status);
 
     // file
     void ask_open_file();
@@ -58,12 +59,16 @@ private slots:
     void load_problem();
     void display_problem(CodeforcesProblem);
 
+    //comp
+    void start_comp();
+
     // open
     void open_preferences();
 
     // custom menu override
     void show_folder_context_menu(const QPoint &point) const;
 private:
+
     void open_file(const QString &file_name);
     void save_file(const QString &file_name);
 

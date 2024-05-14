@@ -1,1 +1,1 @@
-# corgide
+# CorgIDE

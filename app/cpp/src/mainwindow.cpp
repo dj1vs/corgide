@@ -13,6 +13,11 @@
 #include <QSettings>
 #include <QInputDialog>
 #include <QShortcut>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 #include "qsourcehighliter.h"
 #include "fs.hpp"
@@ -21,10 +26,9 @@
 #include "preferencesdialog.hpp"
 #include "probleminputdialog.hpp"
 
+#include "ds/problem.hpp"
+
 #include "font_settings.hpp"
-
-#include "codeforceswrapper.hpp"
-
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -41,10 +45,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->tab_widget, &QTabWidget::tabCloseRequested, this, &MainWindow::close_tab);
 
     read_settings();
-
-    wrapper = new CodeforcesWrapper();
-    connect(wrapper, &CodeforcesWrapper::problem_parsed, this, &MainWindow::display_problem);
-    connect(this, &MainWindow::get_problem, wrapper, &CodeforcesWrapper::get_problem);
 }
 
 MainWindow::~MainWindow() {
@@ -325,28 +325,45 @@ void MainWindow::load_problem()
     ProblemInputDialog dialog;
     dialog.exec();
 
-    if (dialog.result() != QDialog::Rejected) 
+    if (dialog.result() == QDialog::Rejected) 
     {
-        emit get_problem(dialog.get_url());
+        return;
     }
 
-    //TODO: check for correct url
-}
+    QNetworkAccessManager *network_access_manager = new QNetworkAccessManager;
+    connect(network_access_manager, &QNetworkAccessManager::finished, [=] (QNetworkReply *reply)
+    {
+        if (reply->error() != QNetworkReply::NoError)
+        {
+            qWarning() << "Error:" << reply->errorString();
+            reply->deleteLater();
+            return;
+        }
 
-void MainWindow::display_problem(CodeforcesProblem problem) {
-    QString problem_comment = "/*\n";
-    problem_comment += " * Title: " + problem.title +\
-                     "\n\n * Time limit: " + problem.time_limit +\
-                     "\n\n * Memory limit: " + problem.memory_limit +\
-                     "\n\n * Statement: " + problem.statement +\
-                     "\n\n * Input: " + problem.input +\
-                     "\n\n * Output: " + problem.output +\
-                     "\n\n * Examples: " + problem.examples +\
-                     "\n\n * Note: " + problem.note +\
-                    "\n*/\n";
-    
-    auto cur_editor = get_cur_editor();
-    cur_editor->setPlainText(problem_comment + cur_editor->toPlainText());
+            // Read the data from the reply
+        QByteArray responseData = reply->readAll();
+
+        // Parse the data into a QJsonDocument
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
+
+        // Check if the document is valid and is an object
+        if (!jsonDoc.isNull() && jsonDoc.isObject()) {
+            
+            get_cur_editor()->setPlainText("/*" + jsonDoc.toJson() + "*/" + get_cur_editor()->toPlainText());
+
+            // Do something with the jsonObj...
+        } else {
+            qWarning() << "Failed to create JSON object.";
+        }
+
+        // Clean up
+        reply->deleteLater();
+    });
+
+    QNetworkRequest request(QString("http://127.0.0.1:3000/problem?source=timus&problem_title=2035"));
+    network_access_manager->get(request);
+
+    //TODO: check for correct url
 }
 
 void MainWindow::start_comp()

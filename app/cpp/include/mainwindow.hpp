@@ -57,8 +57,6 @@ private slots:
 
     //problem
     void load_problem();
-    void display_problem(CodeforcesProblem);
-
     //comp
     void start_comp();
 
